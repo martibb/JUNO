@@ -31,8 +31,8 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
 
     LOG_INFO("LiDAR sensor process started...\n");
 
-    LIDAR_SAMPLE_EVENT = process_alloc_event();
-    LIDAR_ALARM_EVENT = process_alloc_event();
+    LIDAR_DISTANCE_EVENT = process_alloc_event();
+    LIDAR_OBSTACLE_EVENT = process_alloc_event();
 
     PROCESS_WAIT_EVENT_UNTIL(ev == LIDAR_SUB_EVENT);
 
@@ -46,6 +46,9 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
             distance = (int)generate_random_value(LIDAR_LOWER_BOUND, LIDAR_UPPER_BOUND);
             process_post(subscriber, LIDAR_SAMPLE_EVENT, &distance);
             etimer_reset(&et);
+        }
+        else if(ev == LIDAR_OBSTACLE_EVENT) {
+            LOG_INFO("***** DA IMPLEMENTARE *****\n");
         }
     }
 
