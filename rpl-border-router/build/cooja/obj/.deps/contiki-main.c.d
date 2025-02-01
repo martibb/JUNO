@@ -38,20 +38,20 @@ build/cooja/obj/contiki-main.o: ../../os/contiki-main.c \
  ../../os/net/queuebuf.h ../../os/net/packetbuf.h \
  ../../os/net/mac/llsec802154.h ../../os/net/mac/framer/frame802154.h \
  ../../os/net/mac/csma/csma-security.h ../../os/net/mac/tsch/tsch-conf.h \
- ../../os/net/app-layer/coap/coap-engine.h \
- ../../os/net/app-layer/coap/coap.h \
- ../../os/net/app-layer/coap/coap-constants.h \
- ../../os/net/app-layer/coap/coap-conf.h \
- ../../os/net/app-layer/coap/coap-transport.h \
- ../../os/net/app-layer/coap/coap-endpoint.h \
- ../../os/net/app-layer/coap/coap-timer.h \
- ../../os/net/app-layer/coap/coap-transactions.h \
- ../../os/net/app-layer/coap/coap-engine.h \
- ../../os/net/app-layer/coap/coap-observe.h \
- ../../os/net/app-layer/coap/coap-separate.h \
- ../../os/net/app-layer/coap/coap-observe-client.h \
- ../../os/net/app-layer/snmp/snmp.h ../../os/sys/log.h \
- ../../os/sys/log-conf.h ../../os/net/app-layer/snmp/snmp-conf.h \
+ ../../os/net/org-layer/coap/coap-engine.h \
+ ../../os/net/org-layer/coap/coap.h \
+ ../../os/net/org-layer/coap/coap-constants.h \
+ ../../os/net/org-layer/coap/coap-conf.h \
+ ../../os/net/org-layer/coap/coap-transport.h \
+ ../../os/net/org-layer/coap/coap-endpoint.h \
+ ../../os/net/org-layer/coap/coap-timer.h \
+ ../../os/net/org-layer/coap/coap-transactions.h \
+ ../../os/net/org-layer/coap/coap-engine.h \
+ ../../os/net/org-layer/coap/coap-observe.h \
+ ../../os/net/org-layer/coap/coap-separate.h \
+ ../../os/net/org-layer/coap/coap-observe-client.h \
+ ../../os/net/org-layer/snmp/snmp.h ../../os/sys/log.h \
+ ../../os/sys/log-conf.h ../../os/net/org-layer/snmp/snmp-conf.h \
  ../../os/services/rpl-border-router/rpl-border-router.h \
  ../../os/net/ipv6/uip-ds6.h ../../os/services/orchestra/orchestra.h \
  ../../os/net/mac/tsch/tsch.h ../../os/net/mac/tsch/tsch-const.h \
@@ -162,22 +162,22 @@ project-conf.h:
 ../../os/net/mac/framer/frame802154.h:
 ../../os/net/mac/csma/csma-security.h:
 ../../os/net/mac/tsch/tsch-conf.h:
-../../os/net/app-layer/coap/coap-engine.h:
-../../os/net/app-layer/coap/coap.h:
-../../os/net/app-layer/coap/coap-constants.h:
-../../os/net/app-layer/coap/coap-conf.h:
-../../os/net/app-layer/coap/coap-transport.h:
-../../os/net/app-layer/coap/coap-endpoint.h:
-../../os/net/app-layer/coap/coap-timer.h:
-../../os/net/app-layer/coap/coap-transactions.h:
-../../os/net/app-layer/coap/coap-engine.h:
-../../os/net/app-layer/coap/coap-observe.h:
-../../os/net/app-layer/coap/coap-separate.h:
-../../os/net/app-layer/coap/coap-observe-client.h:
-../../os/net/app-layer/snmp/snmp.h:
+../../os/net/org-layer/coap/coap-engine.h:
+../../os/net/org-layer/coap/coap.h:
+../../os/net/org-layer/coap/coap-constants.h:
+../../os/net/org-layer/coap/coap-conf.h:
+../../os/net/org-layer/coap/coap-transport.h:
+../../os/net/org-layer/coap/coap-endpoint.h:
+../../os/net/org-layer/coap/coap-timer.h:
+../../os/net/org-layer/coap/coap-transactions.h:
+../../os/net/org-layer/coap/coap-engine.h:
+../../os/net/org-layer/coap/coap-observe.h:
+../../os/net/org-layer/coap/coap-separate.h:
+../../os/net/org-layer/coap/coap-observe-client.h:
+../../os/net/org-layer/snmp/snmp.h:
 ../../os/sys/log.h:
 ../../os/sys/log-conf.h:
-../../os/net/app-layer/snmp/snmp-conf.h:
+../../os/net/org-layer/snmp/snmp-conf.h:
 ../../os/services/rpl-border-router/rpl-border-router.h:
 ../../os/net/ipv6/uip-ds6.h:
 ../../os/services/orchestra/orchestra.h:
