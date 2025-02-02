@@ -21,6 +21,7 @@
 
 static char client_id[BUFFER_SIZE];
 static char lidar_topic[BUFFER_SIZE] = "lidar";
+static char control_topic[BUFFER_SIZE] = "sensor/control";
 static char lidar_buffer[APP_BUFFER_SIZE];
 
 static struct mqtt_connection conn;
@@ -40,6 +41,16 @@ AUTOSTART_PROCESSES(&mqtt_client_process);
 static void pub_handler(const char *topic, uint16_t topic_len, const uint8_t *chunk, uint16_t chunk_len) {
     LOG_INFO("Received message on topic: %s\n", topic);
     LOG_INFO("Payload: %.*s\n", chunk_len, (char *)chunk);
+
+    if (strncmp(topic, control_topic, topic_len) == 0) {
+        if (strncmp((char *)chunk, "pause", chunk_len) == 0) {
+            process_post(&lidar_sensor_process, LIDAR_ALARM_EVENT, NULL);
+            LOG_INFO("Publishing paused\n");
+        } else if (strncmp((char *)chunk, "resume", chunk_len) == 0) {
+            process_post(&lidar_sensor_process, LIDAR_ALARM_EVENT, NULL);
+            LOG_INFO("Publishing resumed\n");
+        }
+    }
 }
 
 static void mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data) {
@@ -108,6 +119,7 @@ PROCESS_THREAD(mqtt_client_process, ev, data) {
             }
 
             if (state == STATE_CONNECTED) {
+                mqtt_subscribe(&conn, NULL, control_topic, MQTT_QOS_LEVEL_0);
                 strcpy(lidar_topic, "lidar");
                 state = STATE_SUBSCRIBED;
             }

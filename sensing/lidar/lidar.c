@@ -20,6 +20,8 @@ process_event_t LIDAR_ALARM_EVENT;
 #define LIDAR_OBSTACLE_THRESHOLD 50 // Obstacle threshold (cm)
 #define LIDAR_SAMPLING_INTERVAL 5   // Measurement interval (seconds)
 
+int publishing_enabled = 1; // 1 = Publish, 0 = Pause publication
+
 float generate_random_value(float min, float max) {
     return ((float)rand() / (float)RAND_MAX) * (max - min) + min;
 }
@@ -47,11 +49,22 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
 
         PROCESS_YIELD();
 
-	PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-	distance = (int)generate_random_value(LIDAR_LOWER_BOUND, LIDAR_UPPER_BOUND);
-	LOG_INFO("New LiDAR distance: %d cm\n", distance);
-	process_post(subscriber, LIDAR_DISTANCE_EVENT, &distance);
-	etimer_reset(&et);
+        if (ev == LIDAR_ALARM_EVENT) {
+            publishing_enabled = !publishing_enabled;  // Alterna tra pausa e ripresa
+            if (publishing_enabled) {
+                LOG_INFO("LiDAR resumed, publishing data...\n");
+                etimer_reset(&et);  // Riavvia il timer
+            } else {
+                LOG_INFO("LiDAR paused, stopping data publishing.\n");
+            }
+        }
+
+        if (ev == PROCESS_EVENT_TIMER && etimer_expired(&et) && publishing_enabled) {
+            distance = (int)generate_random_value(LIDAR_LOWER_BOUND, LIDAR_UPPER_BOUND);
+            LOG_INFO("New LiDAR distance: %d cm\n", distance);
+            process_post(subscriber, LIDAR_DISTANCE_EVENT, &distance);
+            etimer_reset(&et);
+        }
     }
 
     PROCESS_END();

@@ -1,6 +1,7 @@
 package org;
 
 import org.MQTT.MQTTCollector;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,11 +17,13 @@ public class Controller {
             "explore       Start a walking session to explore the asteroid\n" +
             "getPosition   Get last reported position of the rover\n" +
             "labTest       Start a laboratory test session of the rover\n" +
+            "pause         Pause the walking session temporary stopping sensors\n" +
             "help          Show all commands\n" +
             "quit          Close controller\n";
 
+    static MQTTCollector MQTTClient;
+
     public static void main(String args[]) throws IOException, InterruptedException {
-        MQTTCollector client = new MQTTCollector();
         coapClient = new CoAPClient();
 
         System.out.println(COMMANDS);
@@ -39,6 +42,9 @@ public class Controller {
                 case "explore":
                     System.out.println("Starting a new automatic walking session...");
                     System.out.println("Currently working on that!");
+
+                    MQTTClient = new MQTTCollector();
+
                     break;
                 case "getPosition":
                     System.out.println("The last position reported from the rover is:");
@@ -47,6 +53,13 @@ public class Controller {
                 case "labTest":
                     System.out.println("Starting a new laboratory test session...");
                     System.out.println("Work in progress!");
+                    break;
+                case "pause":
+                    if (MQTTClient != null) MQTTClient.sendControlCommand("pause");
+                    System.out.println("Digit \'resume\' to resume the walking session.");
+                    break;
+                case "resume":
+                    if (MQTTClient != null) MQTTClient.sendControlCommand("resume");
                     break;
                 default:
                     System.out.println("Command not supported. Try the following:");

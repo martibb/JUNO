@@ -17,12 +17,10 @@ public class MQTTCollector implements MqttCallback{
     private final String clientId = "JavaApp";
     private final String lidarTopic = "lidar";
     private MqttClient mqttClient = null;
-    private CoAPClient coapClient;
 
     //-----------------------------------------------------------------------*/
 
     public MQTTCollector() throws InterruptedException {
-        coapClient = new CoAPClient();
         do {
             try {
                 this.mqttClient = new MqttClient(this.broker,this.clientId);
@@ -84,6 +82,18 @@ public class MQTTCollector implements MqttCallback{
 
     public void deliveryComplete(IMqttDeliveryToken token) {
         System.out.println("I love java -.-\n");
+    }
+
+    public void sendControlCommand(String command) {
+        if (mqttClient.isConnected()) {
+            try {
+                MqttMessage message = new MqttMessage(command.getBytes());
+                mqttClient.publish("sensor/control", message);
+                System.out.println("Sent control command: " + command);
+            } catch (MqttException e) {
+                System.out.println("Failed to send control command: " + e.getMessage());
+            }
+        }
     }
 
     /*public String getRoverStatus() {
