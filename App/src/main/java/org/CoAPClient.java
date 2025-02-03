@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 public class CoAPClient {
-    private String gateBarrierUri;
-    private String monitorUri;
+    private static String servoMotorsUri;
 
     public CoAPClient() {
         String filePath = "actuatorsURI.txt";
@@ -16,10 +16,19 @@ public class CoAPClient {
 
     private void readActuatorURIs(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            // Leggo l'URI dei miei due attuatori
+            servoMotorsUri = reader.readLine();
         } catch (IOException e) {
             System.out.println("Failed to read actuator URIs from file");
             e.printStackTrace();
         }
+    }
+
+    public static String getServoMotorsUri() {
+        return ("coap://["+servoMotorsUri+"]/movement");
+    }
+
+    public static void servoMotorsPostRequest(String uri, String payload) {
+        CoapClient coapClient = new CoapClient(uri);
+        coapClient.post(String.valueOf(payload), MediaTypeRegistry.APPLICATION_JSON);
     }
 }

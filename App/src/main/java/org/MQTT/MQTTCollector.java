@@ -11,16 +11,21 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
+import java.util.AbstractMap;
+import java.util.Map;
+
 // MQTT Client class
 public class MQTTCollector implements MqttCallback{
     private final String broker = "tcp://[fd00::1]:1883";
     private final String clientId = "JavaApp";
     private final String lidarTopic = "lidar";
     private MqttClient mqttClient = null;
+    private CoAPClient coapClient = null;
 
     //-----------------------------------------------------------------------*/
 
     public MQTTCollector() throws InterruptedException {
+        coapClient = new CoAPClient();
         do {
             try {
                 this.mqttClient = new MqttClient(this.broker,this.clientId);
@@ -91,10 +96,21 @@ public class MQTTCollector implements MqttCallback{
             if(topic.equals(lidarTopic))
             {
                 System.out.println(sensorMessage);
-                // Supponiamo che il messaggio contenga i campi: "new sample distance" e "obstacle (boolean)"
+                // Supponiamo che il messaggio contenga il campo "distance"
                 // Dovrò distinguere tra ostacolo e non ostacolo e tra inclinazione pericolosa e non
                 // Dovrò passare i comandi agli attuatori con una richiesta POST
                 // Memorizzo infine le info sul db
+
+                int frontDistance = Integer.parseInt(sensorMessage.get("distance_front").toString());
+                int rightDistance = Integer.parseInt(sensorMessage.get("distance_right").toString());
+                int leftDistance = Integer.parseInt(sensorMessage.get("distance_left").toString());
+
+                Map.Entry<Integer, Integer> motorsCommands = determineDirection(frontDistance, rightDistance, leftDistance);
+                int newDirection = motorsCommands.getKey();
+                int stepSize = motorsCommands.getValue()/2;
+
+                String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
+                CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), PostPayload);
             } else {
                 System.out.println(String.format("Unknown topic: [%s] %s", topic, new String(payload)));
             }
@@ -104,6 +120,33 @@ public class MQTTCollector implements MqttCallback{
             e.printStackTrace();
         }
     }
+
+    public Map.Entry<Integer, Integer> determineDirection(int frontDistance, int rightDistance, int leftDistance) {
+        final int FORWARD = 1;
+        final int RIGHT = 2;
+        final int LEFT = 4;
+        final int MAX_DISTANCE = 100;
+
+        int chosenDirection = FORWARD;
+        int chosenDistance = frontDistance;
+
+        if (frontDistance == rightDistance && frontDistance == leftDistance) {
+            return new AbstractMap.SimpleEntry<>(FORWARD, frontDistance);
+        }
+
+        if (frontDistance < MAX_DISTANCE) {
+            if (rightDistance > leftDistance) {
+                chosenDirection = RIGHT;
+                chosenDistance = rightDistance;
+            } else {
+                chosenDirection = LEFT;
+                chosenDistance = leftDistance;
+            }
+        }
+
+        return new AbstractMap.SimpleEntry<>(chosenDirection, chosenDistance);
+    }
+
 
     public void deliveryComplete(IMqttDeliveryToken token) {
         System.out.println("Delivery completed.\n");

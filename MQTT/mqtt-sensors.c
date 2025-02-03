@@ -17,7 +17,7 @@
 
 #define MAX_TCP_SEGMENT_SIZE 32
 #define BUFFER_SIZE 64
-#define APP_BUFFER_SIZE 128
+#define APP_BUFFER_SIZE 256
 
 static char client_id[BUFFER_SIZE];
 static char lidar_topic[BUFFER_SIZE] = "lidar";
@@ -35,6 +35,12 @@ static uint8_t state;
 #define STATE_SUBSCRIBED 4
 #define STATE_DISCONNECTED 5
 
+typedef struct {
+    int distance_front;
+    int distance_right;
+    int distance_left;
+} lidar_data_t;
+
 PROCESS(mqtt_client_process, "MQTT Client");
 AUTOSTART_PROCESSES(&mqtt_client_process);
 
@@ -46,7 +52,7 @@ static void pub_handler(const char *topic, uint16_t topic_len, const uint8_t *ch
         if (strncmp((char *)chunk, "start", chunk_len) == 0) {
             LOG_INFO("Start sensing command received...\n");
             process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
-        } else if (strncmp((char*)chunk, "stop", chunk_len) ==0) {
+        } else if (strncmp((char*)chunk, "stop", chunk_len) == 0) {
             process_post(&lidar_sensor_process, LIDAR_STOP_EVENT, NULL);
             LOG_INFO("Stop sensing command received...\n");
         }
@@ -99,9 +105,8 @@ PROCESS_THREAD(mqtt_client_process, ev, data) {
     state = STATE_INIT;
 
     process_start(&lidar_sensor_process, NULL);
-    // process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
 
-    etimer_set(&periodic_timer, CLOCK_SECOND * 5); // ogni 5 secondi
+    etimer_set(&periodic_timer, CLOCK_SECOND * 5);
 
     while (1) {
         PROCESS_YIELD();
@@ -124,15 +129,16 @@ PROCESS_THREAD(mqtt_client_process, ev, data) {
                 state = STATE_SUBSCRIBED;
             }
             if(state == STATE_DISCONNECTED){
-		  	 	LOG_ERR("Disconnected from the MQTT broker...\nComing back to the initial state..\n");
-		 	 	state = STATE_INIT;
-		 	}
-			etimer_set(&periodic_timer, CLOCK_SECOND * 5);
+                LOG_ERR("Disconnected from the MQTT broker...\nComing back to the initial state..\n");
+                state = STATE_INIT;
+            }
+            etimer_set(&periodic_timer, CLOCK_SECOND * 5);
         }
         else if(state == STATE_SUBSCRIBED && ev == LIDAR_DISTANCE_EVENT) {
             LOG_INFO("New distance event\n");
-            int distance = *((int *)data);
-            sprintf(lidar_buffer, "{\"distance\": %d}", distance);
+            lidar_data_t *lidar_data = (lidar_data_t *)data;
+            sprintf(lidar_buffer, "{\"distance_front\": %d, \"distance_right\": %d, \"distance_left\": %d}",
+                    lidar_data->distance_front, lidar_data->distance_right, lidar_data->distance_left);
             mqtt_publish(&conn, NULL, lidar_topic, (uint8_t *)lidar_buffer, strlen(lidar_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
         }
     }
