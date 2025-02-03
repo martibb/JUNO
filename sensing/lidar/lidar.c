@@ -44,6 +44,7 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
     LIDAR_SUB_EVENT = process_alloc_event();
     LIDAR_ALARM_EVENT = process_alloc_event();
 
+    PROCESS_WAIT_EVENT_UNTIL(ev == LIDAR_SUB_EVENT);
     etimer_set(&et, CLOCK_SECOND * LIDAR_SAMPLING_INTERVAL);
 
     while (true) {
@@ -52,19 +53,16 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
 
         if (ev == LIDAR_ALARM_EVENT) {
 
-            /*if(!started)
-                started=true;*/
-
             publishing_enabled = !publishing_enabled;
             if (publishing_enabled) {
                 LOG_INFO("LiDAR resumed, publishing data...\n");
-                etimer_reset(&et);  // Riavvia il timer
+                etimer_reset(&et);
             } else {
                 LOG_INFO("LiDAR paused, stopping data publishing.\n");
             }
         }
 
-        if (/*started == true &&*/ ev == PROCESS_EVENT_TIMER && etimer_expired(&et) && publishing_enabled) {
+        if (ev == PROCESS_EVENT_TIMER && etimer_expired(&et) && publishing_enabled) {
             distance = (int)generate_random_value(LIDAR_LOWER_BOUND, LIDAR_UPPER_BOUND);
             LOG_INFO("New LiDAR distance: %d cm\n", distance);
             process_post(subscriber, LIDAR_DISTANCE_EVENT, &distance);
