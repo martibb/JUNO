@@ -1,5 +1,6 @@
 package org;
 
+import org.CoAP.CoAPClient;
 import org.MQTT.MQTTCollector;
 
 import java.io.BufferedReader;

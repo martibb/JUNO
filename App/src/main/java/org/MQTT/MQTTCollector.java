@@ -1,7 +1,6 @@
 package org.MQTT;
 
-import org.CoAPClient;
-import org.JUNODB;
+import org.CoAP.CoAPClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;

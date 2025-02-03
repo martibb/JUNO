@@ -1,4 +1,4 @@
-package org;
+package org.CoAP;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
