@@ -16,19 +16,17 @@ import java.util.Map;
 
 // MQTT Client class
 public class MQTTCollector implements MqttCallback{
-    private final String broker = "tcp://[fd00::1]:1883";
-    private final String clientId = "JavaApp";
     private final String lidarTopic = "lidar";
     private MqttClient mqttClient = null;
-    private CoAPClient coapClient = null;
 
     //-----------------------------------------------------------------------*/
 
     public MQTTCollector() throws InterruptedException {
-        coapClient = new CoAPClient();
         do {
             try {
-                this.mqttClient = new MqttClient(this.broker,this.clientId);
+                String broker = "tcp://[fd00::1]:1883";
+                String clientId = "JavaApp";
+                this.mqttClient = new MqttClient(broker, clientId);
                 System.out.println("Connecting to broker: "+ broker);
 
                 this.mqttClient.setCallback(this);
@@ -81,9 +79,7 @@ public class MQTTCollector implements MqttCallback{
 
                 this.mqttClient.subscribe(lidarTopic);
                 System.out.println("Connection is restored");
-            }catch(MqttException me) {
-                System.out.println("I could not connect");
-            } catch (InterruptedException e) {
+            }catch(MqttException | InterruptedException me) {
                 System.out.println("I could not connect");
             }
         }
@@ -115,10 +111,10 @@ public class MQTTCollector implements MqttCallback{
                 String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
                 CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), PostPayload);
             } else {
-                System.out.println(String.format("Unknown topic: [%s] %s", topic, new String(payload)));
+                System.out.printf("Unknown topic: [%s] %s%n", topic, new String(payload));
             }
         } catch (ParseException e) {
-            System.out.println(String.format("Received badly formatted message: [%s] %s", topic, new String(payload)));
+            System.out.printf("Received badly formatted message: [%s] %s%n", topic, new String(payload));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,8 +172,4 @@ public class MQTTCollector implements MqttCallback{
             }
         }
     }
-
-    /*public String getRoverStatus() {
-        return this.carStatus;
-    }*/
 }
