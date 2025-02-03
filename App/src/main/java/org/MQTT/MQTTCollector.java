@@ -108,6 +108,9 @@ public class MQTTCollector implements MqttCallback{
                 Map.Entry<Integer, Integer> motorsCommands = determineDirection(frontDistance, rightDistance, leftDistance);
                 int newDirection = motorsCommands.getKey();
                 int stepSize = motorsCommands.getValue()/2;
+                if (newDirection == 4 || newDirection == 3) {
+                    stepSize = -stepSize;
+                }
 
                 String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
                 CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), PostPayload);
@@ -124,16 +127,27 @@ public class MQTTCollector implements MqttCallback{
     public Map.Entry<Integer, Integer> determineDirection(int frontDistance, int rightDistance, int leftDistance) {
         final int FORWARD = 1;
         final int RIGHT = 2;
+        final int BACKWARD = 3;
         final int LEFT = 4;
         final int MAX_DISTANCE = 100;
+        final int MIN_DISTANCE = 20;
 
         int chosenDirection = FORWARD;
         int chosenDistance = frontDistance;
 
+        // If in every direction the lidar senses a distance below 20 meters, the rover is in a dead end
+        // so the best decision is to walk backward
+        if (frontDistance < MIN_DISTANCE && rightDistance < MIN_DISTANCE && leftDistance < MIN_DISTANCE) {
+            return new AbstractMap.SimpleEntry<>(BACKWARD, Math.max(frontDistance, Math.max(rightDistance, leftDistance)));
+        }
+
+        // If all directions have equal associated distances there aren't obstacle at all and the rover can go forward
         if (frontDistance == rightDistance && frontDistance == leftDistance) {
             return new AbstractMap.SimpleEntry<>(FORWARD, frontDistance);
         }
 
+        // If the front sensed distance is below the maximum than the sensor can sense, there might be an obstacle,
+        // so the rover moves right or left, depending on the most free path
         if (frontDistance < MAX_DISTANCE) {
             if (rightDistance > leftDistance) {
                 chosenDirection = RIGHT;
@@ -146,7 +160,6 @@ public class MQTTCollector implements MqttCallback{
 
         return new AbstractMap.SimpleEntry<>(chosenDirection, chosenDistance);
     }
-
 
     public void deliveryComplete(IMqttDeliveryToken token) {
         System.out.println("Delivery completed.\n");
