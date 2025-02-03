@@ -132,7 +132,7 @@ PROCESS_THREAD(mqtt_client_process, ev, data) {
         else if(state == STATE_SUBSCRIBED && ev == LIDAR_DISTANCE_EVENT) {
             LOG_INFO("New distance event\n");
             int distance = *((int *)data);
-            snprintf(lidar_buffer, sizeof(lidar_buffer), "Published new distance value: %f", (float)distance); // Consegna questi messaggi al broker MQTT una volta che questo si è iscritto, ogni 5 sec
+            sprintf(lidar_buffer, "{\"distance\": %d}", distance);
             mqtt_publish(&conn, NULL, lidar_topic, (uint8_t *)lidar_buffer, strlen(lidar_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
         }
     }
