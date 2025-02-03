@@ -2,6 +2,7 @@ package org;
 
 import org.CoAP.CoAPClient;
 import org.MQTT.MQTTCollector;
+import org.Persistence.DataManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +11,9 @@ import java.io.InputStreamReader;
 
 
 public class Controller {
+    static MQTTCollector MQTTClient;
     private static CoAPClient coapClient;
+    static DataManager dataManager;
 
     private static String COMMANDS = "--------JUNO Remote Control Application--------\n" +
             "explore       Start a walking session to explore the asteroid\n" +
@@ -19,12 +22,11 @@ public class Controller {
             "help          Show all commands\n" +
             "quit          Close controller\n";
 
-    static MQTTCollector MQTTClient;
-
     public static void main(String args[]) throws IOException, InterruptedException {
 
         coapClient = new CoAPClient();
         MQTTClient = new MQTTCollector();
+        dataManager = DataManager.getInstance();
 
         System.out.println(COMMANDS);
         String command = "";
