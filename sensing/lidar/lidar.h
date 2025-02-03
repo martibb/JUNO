@@ -9,6 +9,8 @@ PROCESS_NAME(lidar_sensor_process);
 
 extern process_event_t LIDAR_DISTANCE_EVENT;
 extern process_event_t LIDAR_SUB_EVENT;
+extern process_event_t LIDAR_START_EVENT;
+extern process_event_t LIDAR_STOP_EVENT;
 
 extern int publishing_enabled;
 
