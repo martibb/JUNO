@@ -43,12 +43,12 @@ static void pub_handler(const char *topic, uint16_t topic_len, const uint8_t *ch
     LOG_INFO("Payload: %.*s\n", chunk_len, (char *)chunk);
 
     if (strncmp(topic, control_topic, topic_len) == 0) {
-        if (strncmp((char *)chunk, "pause", chunk_len) == 0) {
-            process_post(&lidar_sensor_process, LIDAR_ALARM_EVENT, NULL);
-            LOG_INFO("Publishing paused\n");
-        } else if (strncmp((char *)chunk, "resume", chunk_len) == 0) {
-            process_post(&lidar_sensor_process, LIDAR_ALARM_EVENT, NULL);
-            LOG_INFO("Publishing resumed\n");
+        if (strncmp((char *)chunk, "start", chunk_len) == 0) {
+            LOG_INFO("Start sensing command received...\n");
+            process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
+        } else if (strncmp((char*)chunk, "stop", chunk_len) ==0) {
+            process_post(&lidar_sensor_process, LIDAR_STOP_EVENT, NULL);
+            LOG_INFO("Stop sensing command received...\n");
         }
     }
 }
@@ -99,7 +99,7 @@ PROCESS_THREAD(mqtt_client_process, ev, data) {
     state = STATE_INIT;
 
     process_start(&lidar_sensor_process, NULL);
-    process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
+    // process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
 
     etimer_set(&periodic_timer, CLOCK_SECOND * 5); // ogni 5 secondi
 

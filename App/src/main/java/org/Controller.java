@@ -46,11 +46,8 @@ public class Controller {
                     break;
                 case "explore":
                     System.out.println("Starting a new automatic walking session...");
-                    String sessionCommands = "COMMANDS:\n" +
-                            "pause         Pause the walking session\n" +
-                            "resume        When paused, resume the current walking session\n" +
-                            "stop          Stop the current session and return to main menu\n";
-                    System.out.println(sessionCommands);
+                    System.out.println("COMMAND AVAILABLE:");
+                    System.out.println("stop          To stop the current session and return to main menu\\n");
                     MQTTClient.startRetrieving();
                     MQTTClient.sendControlCommand("start");
                     runningSession = true;
@@ -62,13 +59,6 @@ public class Controller {
                 case "labTest":
                     System.out.println("Starting a new laboratory test session...");
                     System.out.println("Work in progress!");
-                    break;
-                case "pause":
-                    System.out.println("Digit \'resume\' to resume the walking session.");
-                    if (runningSession) MQTTClient.sendControlCommand("pause");
-                    break;
-                case "resume":
-                    if (runningSession) MQTTClient.sendControlCommand("resume");
                     break;
                 case "stop":
                     if(runningSession) {
