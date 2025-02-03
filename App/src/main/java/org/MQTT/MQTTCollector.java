@@ -29,13 +29,38 @@ public class MQTTCollector implements MqttCallback{
                 this.mqttClient.setCallback(this);
                 this.mqttClient.connect();
 
-                this.mqttClient.subscribe(this.lidarTopic);
-                System.out.println("Subscribed to topic: " + lidarTopic);
-
             }catch(MqttException me) {
                 System.out.println("I could not connect, Retrying ...");
             }
         }while(!this.mqttClient.isConnected());
+    }
+
+    public void startRetrieving() {
+        subscribeToTopic(lidarTopic);
+    }
+
+    public void subscribeToTopic(String topic) {
+        try {
+            this.mqttClient.subscribe(topic);
+            System.out.println("Subscribed to topic: " + topic);
+        } catch (MqttException e) {
+            System.out.println("Failed to subscribe to topic: " + topic);
+            e.printStackTrace();
+        }
+    }
+
+    public void stopRetrieving() {
+        unsubscribeFromTopic(lidarTopic);
+    }
+
+    public void unsubscribeFromTopic(String topic) {
+        try {
+            this.mqttClient.unsubscribe(topic);
+            System.out.println("Unsubscribed from topic: " + topic);
+        } catch (MqttException e) {
+            System.out.println("Failed to unsubscribe from topic: " + topic);
+            e.printStackTrace();
+        }
     }
 
     public void connectionLost(Throwable cause) {
@@ -81,7 +106,7 @@ public class MQTTCollector implements MqttCallback{
     }
 
     public void deliveryComplete(IMqttDeliveryToken token) {
-        System.out.println("I love java -.-\n");
+        System.out.println("Delivery completed.\n");
     }
 
     public void sendControlCommand(String command) {
