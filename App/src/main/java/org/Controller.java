@@ -73,6 +73,7 @@ public class Controller {
                 case "stop":
                     if(runningSession) {
                         MQTTClient.stopRetrieving();
+                        MQTTClient.sendControlCommand("stop");
                         runningSession = false;
                     }
                     System.out.println("WALKING SESSION STOPPED.\n\n");
