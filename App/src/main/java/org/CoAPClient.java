@@ -10,9 +10,7 @@ public class CoAPClient {
     private String monitorUri;
 
     public CoAPClient() {
-        System.out.println("Current working directory: " + System.getProperty("user.dir"));
-        String filePath = ".\\App\\src\\main\\java\\org\\actuatorsURI.txt";
-        //String filePath = "actuatorsURI.txt"; // TOFIX
+        String filePath = "actuatorsURI.txt";
         readActuatorURIs(filePath);
     }
 
