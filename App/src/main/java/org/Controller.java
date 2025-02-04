@@ -5,6 +5,7 @@ import org.MQTT.MQTTCollector;
 import org.Persistence.DataManager;
 import org.Persistence.Entities.LidarReading;
 import org.Persistence.Entities.MotorsCommand;
+import org.Persistence.Entities.Position;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 public class Controller {
     static MQTTCollector MQTTClient;
     private static CoAPClient coapClient;
+    static Position position;
     static DataManager dataManager;
 
     private static String COMMANDS = "\n\n-------JUNO Remote Control Application--------\n" +
@@ -30,6 +32,7 @@ public class Controller {
 
         coapClient = new CoAPClient();
         MQTTClient = new MQTTCollector();
+        position = Position.getInstance();
         dataManager = DataManager.getInstance();
 
         System.out.println(COMMANDS);
@@ -55,6 +58,7 @@ public class Controller {
                     System.out.println("Starting a new automatic walking session...");
                     System.out.println("COMMAND AVAILABLE:");
                     System.out.println("stop          To stop the current session and return to main menu\\n");
+                    dataManager.initializePosition(false);
                     MQTTClient.startRetrieving();
                     MQTTClient.sendControlCommand("start");
                     runningSession = true;
@@ -66,6 +70,7 @@ public class Controller {
                 case "labTest":
                     System.out.println("Starting a new laboratory test session...");
                     System.out.println("PRESS THE BUTTON OVER THE SENSOR TO DISABLE IT.");
+                    dataManager.initializePosition(true);
                     MQTTClient.startRetrieving();
                     MQTTClient.sendControlCommand("test-session");
                     runningSession = true;

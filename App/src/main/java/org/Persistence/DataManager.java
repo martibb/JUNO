@@ -2,6 +2,7 @@ package org.Persistence;
 
 import org.Persistence.Entities.LidarReading;
 import org.Persistence.Entities.MotorsCommand;
+import org.Persistence.Entities.Position;
 
 import java.sql.*;
 
@@ -12,6 +13,8 @@ public class DataManager {
     private static final String URL = "jdbc:mysql://localhost:3306/rover_control";
     private static final String USER = "juno_driver";
     private static final String PASSWORD = "juno_DRIVER_2025";
+
+    Position position = Position.getInstance();
 
     private DataManager() {
         try {
@@ -38,6 +41,29 @@ public class DataManager {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void initializePosition(boolean testRunning) {
+
+        if(testRunning) {
+            position.resetPosition();
+            return;
+        }
+
+        String query = "SELECT x, y FROM rover_position ORDER BY timestamp DESC LIMIT 1";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                position.setPosition(rs.getInt("x"), rs.getInt("y"));
+                System.out.println("Position loaded from database: " + position);
+            } else {
+                System.out.println("No position founded on db, set as default.");
+                position.setPosition(0, 0);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -105,6 +131,39 @@ public class DataManager {
                         rs.getInt("new_direction"),
                         rs.getInt("step_size")
                 );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void insertPosition() {
+
+        int newX = position.getX();
+        int newY = position.getY();
+
+        String query = "INSERT INTO rover_position (x, y) VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, newX);
+            stmt.setInt(2, newY);
+            stmt.executeUpdate();
+            System.out.println("New position saved.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Position getLastPosition() {
+
+        String query = "SELECT x,y FROM rover_position ORDER BY timestamp DESC LIMIT 1";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                Position position = Position.getInstance();
+                position.setPosition(rs.getInt("x"),rs.getInt("y"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

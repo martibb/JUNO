@@ -4,6 +4,7 @@ import org.CoAP.CoAPClient;
 import org.Persistence.DataManager;
 import org.Persistence.Entities.LidarReading;
 import org.Persistence.Entities.MotorsCommand;
+import org.Persistence.Entities.Position;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -20,7 +21,9 @@ import java.util.Map;
 public class MQTTCollector implements MqttCallback{
     private final String lidarTopic = "lidar";
     private MqttClient mqttClient = null;
+    private boolean testRunning;
     private DataManager dataManager = DataManager.getInstance();
+    private Position position = Position.getInstance();
 
     //-----------------------------------------------------------------------*/
 
@@ -105,6 +108,10 @@ public class MQTTCollector implements MqttCallback{
                 MotorsCommand newMotorsRecord = new MotorsCommand(newLidarRecord);
                 dataManager.insertMotorsCommand(newMotorsRecord);
 
+                position.updatePosition(newMotorsRecord);
+                if(!testRunning)
+                    dataManager.insertPosition();
+
                 int newDirection = newMotorsRecord.getNewDirection();
                 int stepSize = newMotorsRecord.getStepSize();
                 String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
@@ -125,6 +132,12 @@ public class MQTTCollector implements MqttCallback{
 
     public void sendControlCommand(String command) {
         if (mqttClient.isConnected()) {
+
+            if(command.equals("start") || command.equals("stop"))
+                testRunning = false;
+            else if(command.equals("test-session"))
+                testRunning = true;
+
             try {
                 MqttMessage message = new MqttMessage(command.getBytes());
                 mqttClient.publish("sensor/control", message);
