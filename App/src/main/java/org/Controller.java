@@ -65,7 +65,9 @@ public class Controller {
                     break;
                 case "labTest":
                     System.out.println("Starting a new laboratory test session...");
-                    System.out.println("Work in progress!");
+                    System.out.println("PRESS THE BUTTON OVER THE SENSOR TO DISABLE IT.");
+                    MQTTClient.startRetrieving();
+                    MQTTClient.sendControlCommand("test-session");
                     break;
                 case "stop":
                     if(runningSession) {
