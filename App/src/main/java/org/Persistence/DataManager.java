@@ -1,5 +1,8 @@
 package org.Persistence;
 
+import org.Persistence.Entities.LidarReading;
+import org.Persistence.Entities.MotorsCommand;
+
 import java.sql.*;
 
 public class DataManager {
@@ -38,28 +41,76 @@ public class DataManager {
         }
     }
 
-    public void insertLidarReading(float distanceFront) {
-        String query = "INSERT INTO lidar_readings (distance_front) VALUES (?)";
+    public void insertLidarReading(LidarReading newRecord) {
+
+        int distanceFront = newRecord.getDistanceFront();
+        int distanceRight = newRecord.getDistanceRight();
+        int distanceLeft = newRecord.getDistanceLeft();
+
+        String query = "INSERT INTO lidar_readings (distance_front, distance_right, distance_left) VALUES (?, ?, ?)";
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setFloat(1, distanceFront);
+            stmt.setFloat(2, distanceRight);
+            stmt.setFloat(3, distanceLeft);
             stmt.executeUpdate();
-            System.out.println("Dati Lidar salvati: " + distanceFront + " m");
+            System.out.println("Lidar data saved: Front: " + distanceFront + " m, Right: " + distanceRight + " m, Left: " + distanceLeft + " m");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public float getLastLidarReading() {
-        String query = "SELECT distance_front FROM lidar_readings ORDER BY timestamp DESC LIMIT 1";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+    public LidarReading getLastLidarReading() {
+        String query = "SELECT distance_front, distance_right, distance_left FROM lidar_readings ORDER BY timestamp DESC LIMIT 1";
+
+        try (Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(query)) {
             if (rs.next()) {
-                return rs.getFloat("distance_front");
+                return new LidarReading(
+                        rs.getInt("distance_front"),
+                        rs.getInt("distance_right"),
+                        rs.getInt("distance_left")
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1;  // Valore di default se non ci sono dati
+        return null;
+    }
+
+    public void insertMotorsCommand(MotorsCommand newRecord) {
+
+        int newDirection = newRecord.getNewDirection();
+        int stepSize = newRecord.getStepSize();
+
+        String query = "INSERT INTO leg_commands (new_direction, step_size) VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setFloat(1, newDirection);
+            stmt.setFloat(2, stepSize);
+            stmt.executeUpdate();
+            System.out.println("Servo Motors Command saved.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MotorsCommand getLastMotorsCommand() {
+
+        String query = "SELECT new_direction, step_size FROM leg_commands ORDER BY timestamp DESC LIMIT 1";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return new MotorsCommand(
+                        rs.getInt("new_direction"),
+                        rs.getInt("step_size")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public void insertGyroReading(float angle) {
@@ -67,7 +118,7 @@ public class DataManager {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setFloat(1, angle);
             stmt.executeUpdate();
-            System.out.println("Dati Giroscopio salvati: " + angle + "°");
+            System.out.println("Gyroscope data saved: " + angle + "°");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -86,37 +137,12 @@ public class DataManager {
         return null;
     }
 
-    public void insertLegCommand(float newDirection, float stepSize) {
-        String query = "INSERT INTO leg_commands (new_direction, step_size) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setFloat(1, newDirection);
-            stmt.setFloat(2, stepSize);
-            stmt.executeUpdate();
-            System.out.println("Comando Gambe salvato: Direzione " + newDirection + "°, Passo " + stepSize + " cm");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getLastLegCommand() {
-        String query = "SELECT new_direction, step_size FROM leg_commands ORDER BY timestamp DESC LIMIT 1";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            if (rs.next()) {
-                return "Direzione: " + rs.getFloat("new_direction") + "°, Passo: " + rs.getFloat("step_size") + " cm";
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "Nessun comando trovato.";
-    }
-
     public void insertHarpoonCommand(boolean fire) {
         String query = "INSERT INTO harpoon_commands (fire) VALUES (?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setBoolean(1, fire);
             stmt.executeUpdate();
-            System.out.println("Comando Arpioni salvato: " + (fire ? "LANCIO" : "FERMO"));
+            System.out.println("Harpoons command saved: " + (fire ? "Active" : "Unactive"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -127,11 +153,11 @@ public class DataManager {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
-                return rs.getBoolean("fire") ? "LANCIO" : "FERMO";
+                return rs.getBoolean("fire") ? "Active" : "Unactive";
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "Nessun comando trovato.";
+        return "No command found.";
     }
 }

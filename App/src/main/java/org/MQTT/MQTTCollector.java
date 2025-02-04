@@ -1,6 +1,9 @@
 package org.MQTT;
 
 import org.CoAP.CoAPClient;
+import org.Persistence.DataManager;
+import org.Persistence.Entities.LidarReading;
+import org.Persistence.Entities.MotorsCommand;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -17,6 +20,7 @@ import java.util.Map;
 public class MQTTCollector implements MqttCallback{
     private final String lidarTopic = "lidar";
     private MqttClient mqttClient = null;
+    private DataManager dataManager = DataManager.getInstance();
 
     //-----------------------------------------------------------------------*/
 
@@ -99,6 +103,8 @@ public class MQTTCollector implements MqttCallback{
                 int frontDistance = Integer.parseInt(sensorMessage.get("distance_front").toString());
                 int rightDistance = Integer.parseInt(sensorMessage.get("distance_right").toString());
                 int leftDistance = Integer.parseInt(sensorMessage.get("distance_left").toString());
+                LidarReading newLidarRecord = new LidarReading(frontDistance, rightDistance, leftDistance);
+                dataManager.insertLidarReading(newLidarRecord);
 
                 Map.Entry<Integer, Integer> motorsCommands = determineDirection(frontDistance, rightDistance, leftDistance);
                 int newDirection = motorsCommands.getKey();
@@ -106,9 +112,12 @@ public class MQTTCollector implements MqttCallback{
                 if (newDirection == 4 || newDirection == 3) {
                     stepSize = -stepSize;
                 }
+                MotorsCommand newMotorsRecord = new MotorsCommand(newDirection, stepSize);
+                dataManager.insertMotorsCommand(newMotorsRecord);
 
                 String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
                 CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), PostPayload);
+
             } else {
                 System.out.printf("Unknown topic: [%s] %s%n", topic, new String(payload));
             }

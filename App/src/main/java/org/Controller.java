@@ -3,6 +3,8 @@ package org;
 import org.CoAP.CoAPClient;
 import org.MQTT.MQTTCollector;
 import org.Persistence.DataManager;
+import org.Persistence.Entities.LidarReading;
+import org.Persistence.Entities.MotorsCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,10 +17,12 @@ public class Controller {
     private static CoAPClient coapClient;
     static DataManager dataManager;
 
-    private static String COMMANDS = "--------JUNO Remote Control Application--------\n" +
+    private static String COMMANDS = "\n\n-------JUNO Remote Control Application--------\n" +
             "explore       Start a walking session to explore the asteroid\n" +
             "getPosition   Get last reported position of the rover\n" +
             "labTest       Start a laboratory test session of the rover\n" +
+            "lastLidar     Read last distances sensed by the LiDAR sensor\n" +
+            "lastMotors    Read last command executed by the servo motors of the rover's legs\n" +
             "help          Show all commands\n" +
             "quit          Close controller\n";
 
@@ -71,6 +75,20 @@ public class Controller {
                     }
                     System.out.println("WALKING SESSION STOPPED.\n\n");
                     System.out.println(COMMANDS);
+                    break;
+                case "lastLidar":
+                    LidarReading lastLidarReading = dataManager.getLastLidarReading();
+                    if(lastLidarReading==null)
+                        System.out.println("No records stored yet.");
+                    else
+                        System.out.println(lastLidarReading);
+                    break;
+                case "lastMotors":
+                    MotorsCommand lastMotorsCommand = dataManager.getLastMotorsCommand();
+                    if(lastMotorsCommand==null)
+                        System.out.println("No records stored yet.");
+                    else
+                        System.out.println(lastMotorsCommand);
                     break;
                 default:
                     System.out.println("Command not supported. Try the following:");
