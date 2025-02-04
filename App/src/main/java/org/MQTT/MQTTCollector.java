@@ -95,10 +95,6 @@ public class MQTTCollector implements MqttCallback{
             if(topic.equals(lidarTopic))
             {
                 System.out.println(sensorMessage);
-                // Supponiamo che il messaggio contenga il campo "distance"
-                // Dovrò distinguere tra ostacolo e non ostacolo e tra inclinazione pericolosa e non
-                // Dovrò passare i comandi agli attuatori con una richiesta POST
-                // Memorizzo infine le info sul db
 
                 int frontDistance = Integer.parseInt(sensorMessage.get("distance_front").toString());
                 int rightDistance = Integer.parseInt(sensorMessage.get("distance_right").toString());
@@ -106,18 +102,13 @@ public class MQTTCollector implements MqttCallback{
                 LidarReading newLidarRecord = new LidarReading(frontDistance, rightDistance, leftDistance);
                 dataManager.insertLidarReading(newLidarRecord);
 
-                Map.Entry<Integer, Integer> motorsCommands = determineDirection(frontDistance, rightDistance, leftDistance);
-                int newDirection = motorsCommands.getKey();
-                int stepSize = motorsCommands.getValue()/2;
-                if (newDirection == 4 || newDirection == 3) {
-                    stepSize = -stepSize;
-                }
-                MotorsCommand newMotorsRecord = new MotorsCommand(newDirection, stepSize);
+                MotorsCommand newMotorsRecord = new MotorsCommand(newLidarRecord);
                 dataManager.insertMotorsCommand(newMotorsRecord);
 
+                int newDirection = newMotorsRecord.getNewDirection();
+                int stepSize = newMotorsRecord.getStepSize();
                 String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
                 CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), PostPayload);
-
             } else {
                 System.out.printf("Unknown topic: [%s] %s%n", topic, new String(payload));
             }
@@ -126,43 +117,6 @@ public class MQTTCollector implements MqttCallback{
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public Map.Entry<Integer, Integer> determineDirection(int frontDistance, int rightDistance, int leftDistance) {
-        final int FORWARD = 1;
-        final int RIGHT = 2;
-        final int BACKWARD = 3;
-        final int LEFT = 4;
-        final int MAX_DISTANCE = 100;
-        final int MIN_DISTANCE = 20;
-
-        int chosenDirection = FORWARD;
-        int chosenDistance = frontDistance;
-
-        // If in every direction the lidar senses a distance below 20 meters, the rover is in a dead end
-        // so the best decision is to walk backward
-        if (frontDistance < MIN_DISTANCE && rightDistance < MIN_DISTANCE && leftDistance < MIN_DISTANCE) {
-            return new AbstractMap.SimpleEntry<>(BACKWARD, Math.max(frontDistance, Math.max(rightDistance, leftDistance)));
-        }
-
-        // If all directions have equal associated distances there aren't obstacle at all and the rover can go forward
-        if (frontDistance == rightDistance && frontDistance == leftDistance) {
-            return new AbstractMap.SimpleEntry<>(FORWARD, frontDistance);
-        }
-
-        // If the front sensed distance is below the maximum than the sensor can sense, there might be an obstacle,
-        // so the rover moves right or left, depending on the most free path
-        if (frontDistance < MAX_DISTANCE) {
-            if (rightDistance > leftDistance) {
-                chosenDirection = RIGHT;
-                chosenDistance = rightDistance;
-            } else {
-                chosenDirection = LEFT;
-                chosenDistance = leftDistance;
-            }
-        }
-
-        return new AbstractMap.SimpleEntry<>(chosenDirection, chosenDistance);
     }
 
     public void deliveryComplete(IMqttDeliveryToken token) {
