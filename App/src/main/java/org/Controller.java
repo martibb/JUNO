@@ -68,6 +68,7 @@ public class Controller {
                     System.out.println("PRESS THE BUTTON OVER THE SENSOR TO DISABLE IT.");
                     MQTTClient.startRetrieving();
                     MQTTClient.sendControlCommand("test-session");
+                    runningSession = true;
                     break;
                 case "stop":
                     if(runningSession) {

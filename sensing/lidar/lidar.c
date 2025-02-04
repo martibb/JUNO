@@ -22,7 +22,7 @@ process_event_t LIDAR_STOP_EVENT;
 #define LIDAR_SAMPLING_INTERVAL 5   // Measurement interval (seconds)
 
 int publishing_enabled = 1; // 1 = Publish, 0 = Pause publishing
-bool test_running = 0; // 0 = explore session, 1 = test session
+int test_running = 0; // 0 = explore session, 1 = test session
 
 typedef struct {
     int distance_front;
@@ -48,6 +48,12 @@ void update_leds(int distance) {
         leds_off(LEDS_YELLOW);
         leds_on(LEDS_RED);
     }
+}
+
+void reset_leds() {
+    leds_off(LEDS_GREEN);
+    leds_off(LEDS_YELLOW);
+    leds_off(LEDS_RED);
 }
 
 PROCESS(lidar_sensor_process, "LiDAR sensor process");
@@ -86,12 +92,21 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
             }
 
             if(ev == LIDAR_STOP_EVENT) {
+
+                if(test_running==1) {
+                    test_running = 0;
+                    reset_leds();
+                }
+
                 break;
             }
 
             if (ev == PROCESS_EVENT_TIMER && etimer_expired(&et) && publishing_enabled) {
                 lidar_data.distance_front = generate_lidar_value();
-                update_leds(lidar_data.distance_front);
+
+                if(test_running==1) {
+                    update_leds(lidar_data.distance_front);
+                }
 
                 lidar_data.distance_right = generate_lidar_value();
                 lidar_data.distance_left = generate_lidar_value();
