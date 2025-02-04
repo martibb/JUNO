@@ -50,11 +50,16 @@ static void pub_handler(const char *topic, uint16_t topic_len, const uint8_t *ch
 
     if (strncmp(topic, control_topic, topic_len) == 0) {
         if (strncmp((char *)chunk, "start", chunk_len) == 0) {
-            LOG_INFO("Start sensing command received...\n");
+            test_running = 0;
             process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
+            LOG_INFO("Start sensing command received...\n");
         } else if (strncmp((char*)chunk, "stop", chunk_len) == 0) {
             process_post(&lidar_sensor_process, LIDAR_STOP_EVENT, NULL);
             LOG_INFO("Stop sensing command received...\n");
+        } else if (strncmp((char*)chunk, "test-session", chunk_len) == 0) {
+            test_running = 1;
+            process_post(&lidar_sensor_process, LIDAR_SUB_EVENT, &mqtt_client_process);
+            LOG_INFO("Test session started.\n");
         }
     }
 }

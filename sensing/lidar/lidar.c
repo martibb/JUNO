@@ -17,11 +17,11 @@ process_event_t LIDAR_SUB_EVENT;
 process_event_t LIDAR_ALARM_EVENT;
 process_event_t LIDAR_STOP_EVENT;
 
-#define LIDAR_MAX_DISTANCE 100  // Max distance (meters)
+#define LIDAR_MAX_DISTANCE 100  // Maximum distance (meters)
 #define LIDAR_OBSTACLE_PROBABILITY 0.2 // Obstacle probability
 #define LIDAR_SAMPLING_INTERVAL 5   // Measurement interval (seconds)
 
-int publishing_enabled = 1; // 1 = Publish, 0 = Pause publication
+int publishing_enabled = 1; // 1 = Publish, 0 = Pause publishing
 bool test_running = 0; // 0 = explore session, 1 = test session
 
 typedef struct {
@@ -55,7 +55,6 @@ PROCESS(lidar_sensor_process, "LiDAR sensor process");
 PROCESS_THREAD(lidar_sensor_process, ev, data) {
     static struct etimer et;
     static struct process *subscriber;
-    button_hal_button_t *btn;
     static lidar_data_t lidar_data;
 
     PROCESS_BEGIN();
@@ -69,8 +68,6 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
     LIDAR_ALARM_EVENT = process_alloc_event();
     LIDAR_STOP_EVENT = process_alloc_event();
 
-    btn = button_hal_get_by_index(0);
-
     while(true) {
         PROCESS_WAIT_EVENT_UNTIL(ev == LIDAR_SUB_EVENT);
         etimer_set(&et, CLOCK_SECOND * LIDAR_SAMPLING_INTERVAL);
@@ -78,13 +75,13 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
         while (true) {
             PROCESS_YIELD();
 
-            if (ev == LIDAR_ALARM_EVENT) {
+            if (ev == button_hal_press_event && test_running == 1) {
                 publishing_enabled = !publishing_enabled;
                 if (publishing_enabled) {
                     LOG_INFO("LiDAR resumed, publishing data...\n");
                     etimer_reset(&et);
                 } else {
-                    LOG_INFO("LiDAR paused, stopping data publishing.\n");
+                    LOG_INFO("Simulating LiDAR out of order. LiDAR paused, stopping data publishing.\n");
                 }
             }
 
@@ -104,12 +101,6 @@ PROCESS_THREAD(lidar_sensor_process, ev, data) {
 
                 process_post(subscriber, LIDAR_DISTANCE_EVENT, &lidar_data);
                 etimer_reset(&et);
-            }
-
-            if  (ev == button_hal_press_event) {
-                btn = (button_hal_button_t *)data;
-
-                printf("Press event (%s)\n", BUTTON_HAL_GET_DESCRIPTION(btn));
             }
         }
     }
