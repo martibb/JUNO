@@ -19,7 +19,7 @@ public class DataManager {
     private DataManager() {
         try {
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connected with JUNO database.");
+            System.out.println("Connected to JUNO database.");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Error during database connection.");
@@ -57,7 +57,7 @@ public class DataManager {
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 position.setPosition(rs.getInt("x"), rs.getInt("y"));
-                System.out.println("Position loaded from database: " + position);
+                System.out.println("Position loaded from database.");
             } else {
                 System.out.println("No position founded on db, set as default.");
                 position.setPosition(0, 0);

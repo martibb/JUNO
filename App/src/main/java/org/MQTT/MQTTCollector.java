@@ -14,43 +14,42 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
-import java.util.AbstractMap;
-import java.util.Map;
-
 // MQTT Client class
 public class MQTTCollector implements MqttCallback{
     private final String lidarTopic = "lidar";
+    //private final String gyroscopeTopic = "gyroscope";
     private MqttClient mqttClient = null;
     private boolean testRunning;
-    private DataManager dataManager = DataManager.getInstance();
-    private Position position = Position.getInstance();
+    private final DataManager dataManager = DataManager.getInstance();
+    private final Position position = Position.getInstance();
 
     //-----------------------------------------------------------------------*/
 
-    public MQTTCollector() throws InterruptedException {
+    public MQTTCollector() {
         do {
             try {
                 String broker = "tcp://[fd00::1]:1883";
                 String clientId = "JavaApp";
-                this.mqttClient = new MqttClient(broker, clientId);
+                mqttClient = new MqttClient(broker, clientId);
                 System.out.println("Connecting to broker: "+ broker);
 
-                this.mqttClient.setCallback(this);
-                this.mqttClient.connect();
+                mqttClient.setCallback(this);
+                mqttClient.connect();
 
             }catch(MqttException me) {
                 System.out.println("I could not connect, Retrying ...");
             }
-        }while(!this.mqttClient.isConnected());
+        }while(!mqttClient.isConnected());
     }
 
     public void startRetrieving() {
         subscribeToTopic(lidarTopic);
+        //subscribeToTopic(gyroscopeTopic);
     }
 
     public void subscribeToTopic(String topic) {
         try {
-            this.mqttClient.subscribe(topic);
+            mqttClient.subscribe(topic);
             System.out.println("Subscribed to topic: " + topic);
         } catch (MqttException e) {
             System.out.println("Failed to subscribe to topic: " + topic);
@@ -60,11 +59,12 @@ public class MQTTCollector implements MqttCallback{
 
     public void stopRetrieving() {
         unsubscribeFromTopic(lidarTopic);
+        //unsubscribeFromTopic(gyroscopeTopic);
     }
 
     public void unsubscribeFromTopic(String topic) {
         try {
-            this.mqttClient.unsubscribe(topic);
+            mqttClient.unsubscribe(topic);
             System.out.println("Unsubscribed from topic: " + topic);
         } catch (MqttException e) {
             System.out.println("Failed to unsubscribe from topic: " + topic);
@@ -75,15 +75,16 @@ public class MQTTCollector implements MqttCallback{
     public void connectionLost(Throwable cause) {
         System.out.println("Connection is broken: " + cause);
         int timeWindow = 3000;
-        while (!this.mqttClient.isConnected()) {
+        while (!mqttClient.isConnected()) {
             try {
                 System.out.println("Trying to reconnect in " + timeWindow/1000 + " seconds.");
                 Thread.sleep(timeWindow);
                 System.out.println("Reconnecting ...");
                 timeWindow *= 2;
-                this.mqttClient.connect();
+                mqttClient.connect();
 
-                this.mqttClient.subscribe(lidarTopic);
+                mqttClient.subscribe(lidarTopic);
+                //mqttClient.subscribe(gyroscopeTopic);
                 System.out.println("Connection is restored");
             }catch(MqttException | InterruptedException me) {
                 System.out.println("I could not connect");
@@ -140,7 +141,9 @@ public class MQTTCollector implements MqttCallback{
 
             try {
                 MqttMessage message = new MqttMessage(command.getBytes());
-                mqttClient.publish("sensor/control", message);
+                mqttClient.publish("sensor/control", message); // prima versione test (solo lidar) + legs-servo-motors
+                //mqttClient.publish("lidar/control", message);
+                //mqttClient.publish("gyroscope/control", message);
                 System.out.println("Sent control command: " + command);
             } catch (MqttException e) {
                 System.out.println("Failed to send control command: " + e.getMessage());

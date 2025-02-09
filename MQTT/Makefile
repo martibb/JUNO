@@ -11,5 +11,6 @@ MODULES += $(CONTIKI_NG_APP_LAYER_DIR)/mqtt
 
 MODULES_REL += arch/platform/$(TARGET)
 MODULES_REL += $(ROOT)/sensing/
+MUDULES_REL += $(ROOT)/sensing/gyroscope
 
 include $(CONTIKI)/Makefile.include

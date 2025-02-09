@@ -13,6 +13,6 @@ extern process_event_t LIDAR_START_EVENT;
 extern process_event_t LIDAR_STOP_EVENT;
 
 extern int publishing_enabled;
-extern bool test_running;
+extern int test_running;
 
 #endif
