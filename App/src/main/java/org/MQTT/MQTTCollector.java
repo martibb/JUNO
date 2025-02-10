@@ -12,7 +12,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 
 // MQTT Client class
 public class MQTTCollector implements MqttCallback{
@@ -144,7 +143,6 @@ public class MQTTCollector implements MqttCallback{
         }
     }
 
-    // Thread separato per il giroscopio
     private void handleGyroscopeMessage(JSONObject sensorMessage) {
         try {
             System.out.println("\nWork in progress for gyroscope.\n");

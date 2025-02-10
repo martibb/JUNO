@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import static java.lang.Thread.sleep;
 
 
 public class Controller {
@@ -77,11 +78,15 @@ public class Controller {
                     break;
                 case "stop":
                     if(runningSession) {
+                        System.out.println("\nStopping session... \n");
+                        System.out.println("\nYou may receive the last data collected from sensors after the stop " +
+                                "command. ");
+                        sleep(1000);
                         MQTTClient.stopRetrieving();
                         MQTTClient.sendControlCommand("stop");
                         runningSession = false;
                     }
-                    System.out.println("WALKING SESSION STOPPED.\n\n");
+                    System.out.println("\nWALKING SESSION STOPPED.\n\n");
                     System.out.println(COMMANDS);
                     break;
                 case "lastLidar":
