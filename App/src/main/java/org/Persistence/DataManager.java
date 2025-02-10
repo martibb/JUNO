@@ -219,4 +219,17 @@ public class DataManager {
         }
         return "No command found.";
     }
+
+    public void insertGyroscopeData(float angleX, float angleY, float angleZ) {
+        String query = "INSERT INTO gyro_readings (angle_x, angle_y, angle_z) VALUES (?,?,?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setFloat(1, angleX);
+            stmt.setFloat(2, angleY);
+            stmt.setFloat(3, angleZ);
+            stmt.executeUpdate();
+            System.out.println("Gyroscope data saved.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

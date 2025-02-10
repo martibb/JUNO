@@ -146,19 +146,22 @@ public class MQTTCollector implements MqttCallback{
     private void handleGyroscopeMessage(JSONObject sensorMessage) {
         try {
             System.out.println("\nWork in progress for gyroscope.\n");
-            /*
-            double angleX = Double.parseDouble(sensorMessage.get("angle_x").toString());
-            double angleY = Double.parseDouble(sensorMessage.get("angle_y").toString());
-            double angleZ = Double.parseDouble(sensorMessage.get("angle_z").toString());
+
+            float angleX = Float.parseFloat(sensorMessage.get("gyro_x").toString());
+            float angleY = Float.parseFloat(sensorMessage.get("gyro_y").toString());
+            float angleZ = Float.parseFloat(sensorMessage.get("gyro_z").toString());
 
             dataManager.insertGyroscopeData(angleX, angleY, angleZ);
 
-            // Richiesta CoAP separata per il giroscopio (harpoons)
             long startTime = System.currentTimeMillis();
             String postPayload = "{ \"angle_x\": " + angleX + ", \"angle_y\": " + angleY + ", \"angle_z\": " + angleZ + " }";
-            CoAPClient.harpoonsPostRequest(CoAPClient.getHarpoonsUri(), postPayload);
+
+            System.out.println(postPayload);
+
+            //CoAPClient.harpoonsPostRequest(CoAPClient.getHarpoonsUri(), postPayload);
+
             long endTime = System.currentTimeMillis();
-            System.out.println("[GYROSCOPE] CoAP Request Time: " + (endTime - startTime) + " ms");*/
+            System.out.println("[GYROSCOPE] CoAP Request Time: " + (endTime - startTime) + " ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
