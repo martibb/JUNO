@@ -17,7 +17,7 @@ import org.json.simple.parser.ParseException;
 // MQTT Client class
 public class MQTTCollector implements MqttCallback{
     private final String lidarTopic = "lidar";
-    //private final String gyroscopeTopic = "gyroscope";
+    private final String gyroscopeTopic = "gyroscope";
     private MqttClient mqttClient = null;
     private boolean testRunning;
     private final DataManager dataManager = DataManager.getInstance();
@@ -44,7 +44,7 @@ public class MQTTCollector implements MqttCallback{
 
     public void startRetrieving() {
         subscribeToTopic(lidarTopic);
-        //subscribeToTopic(gyroscopeTopic);
+        subscribeToTopic(gyroscopeTopic);
     }
 
     public void subscribeToTopic(String topic) {
@@ -92,36 +92,75 @@ public class MQTTCollector implements MqttCallback{
         }
     }
 
-    public void messageArrived(String topic, MqttMessage message) throws Exception {
+    public void messageArrived(String topic, MqttMessage message) {
         byte[] payload = message.getPayload();
+        System.out.println("New message received!");
+
         try {
             JSONObject sensorMessage = (JSONObject) JSONValue.parseWithException(new String(payload));
-            if(topic.equals(lidarTopic))
-            {
-                System.out.println(sensorMessage);
 
-                int frontDistance = Integer.parseInt(sensorMessage.get("distance_front").toString());
-                int rightDistance = Integer.parseInt(sensorMessage.get("distance_right").toString());
-                int leftDistance = Integer.parseInt(sensorMessage.get("distance_left").toString());
-                LidarReading newLidarRecord = new LidarReading(frontDistance, rightDistance, leftDistance);
-                dataManager.insertLidarReading(newLidarRecord);
-
-                MotorsCommand newMotorsRecord = new MotorsCommand(newLidarRecord);
-                dataManager.insertMotorsCommand(newMotorsRecord);
-
-                position.updatePosition(newMotorsRecord);
-                if(!testRunning)
-                    dataManager.insertPosition();
-
-                int newDirection = newMotorsRecord.getNewDirection();
-                int stepSize = newMotorsRecord.getStepSize();
-                String PostPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
-                CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), PostPayload);
+            if (topic.equals(lidarTopic)) {
+                new Thread(() -> handleLidarMessage(sensorMessage)).start();
+            } else if (topic.equals(gyroscopeTopic)) {
+                new Thread(() -> handleGyroscopeMessage(sensorMessage)).start();
             } else {
                 System.out.printf("Unknown topic: [%s] %s%n", topic, new String(payload));
             }
-        } catch (ParseException e) {
-            System.out.printf("Received badly formatted message: [%s] %s%n", topic, new String(payload));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleLidarMessage(JSONObject sensorMessage) {
+        try {
+            int frontDistance = Integer.parseInt(sensorMessage.get("distance_front").toString());
+            int rightDistance = Integer.parseInt(sensorMessage.get("distance_right").toString());
+            int leftDistance = Integer.parseInt(sensorMessage.get("distance_left").toString());
+
+            LidarReading newLidarRecord = new LidarReading(frontDistance, rightDistance, leftDistance);
+            dataManager.insertLidarReading(newLidarRecord);
+
+            MotorsCommand newMotorsRecord = new MotorsCommand(newLidarRecord);
+
+            synchronized (this) {
+                dataManager.insertMotorsCommand(newMotorsRecord);
+
+                position.updatePosition(newMotorsRecord);
+                if (!testRunning) {
+                    dataManager.insertPosition();
+                }
+            }
+
+            long startTime = System.currentTimeMillis();
+            int newDirection = newMotorsRecord.getNewDirection();
+            int stepSize = newMotorsRecord.getStepSize();
+            String postPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
+            CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), postPayload);
+
+            long endTime = System.currentTimeMillis();
+            System.out.println("[LIDAR] CoAP Request Time: " + (endTime - startTime) + " ms");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Thread separato per il giroscopio
+    private void handleGyroscopeMessage(JSONObject sensorMessage) {
+        try {
+            System.out.println("Work in progress for gyroscope.");
+            /*
+            double angleX = Double.parseDouble(sensorMessage.get("angle_x").toString());
+            double angleY = Double.parseDouble(sensorMessage.get("angle_y").toString());
+            double angleZ = Double.parseDouble(sensorMessage.get("angle_z").toString());
+
+            dataManager.insertGyroscopeData(angleX, angleY, angleZ);
+
+            // Richiesta CoAP separata per il giroscopio (harpoons)
+            long startTime = System.currentTimeMillis();
+            String postPayload = "{ \"angle_x\": " + angleX + ", \"angle_y\": " + angleY + ", \"angle_z\": " + angleZ + " }";
+            CoAPClient.harpoonsPostRequest(CoAPClient.getHarpoonsUri(), postPayload);
+            long endTime = System.currentTimeMillis();
+            System.out.println("[GYROSCOPE] CoAP Request Time: " + (endTime - startTime) + " ms");*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,9 +180,10 @@ public class MQTTCollector implements MqttCallback{
 
             try {
                 MqttMessage message = new MqttMessage(command.getBytes());
-                mqttClient.publish("sensor/control", message); // prima versione test (solo lidar) + legs-servo-motors
+                //mqttClient.publish("sensor/control", message); // prima versione test (solo lidar) + legs-servo-motors
                 //mqttClient.publish("lidar/control", message);
                 //mqttClient.publish("gyroscope/control", message);
+                mqttClient.publish("sensor/control", message);
                 System.out.println("Sent control command: " + command);
             } catch (MqttException e) {
                 System.out.println("Failed to send control command: " + e.getMessage());
