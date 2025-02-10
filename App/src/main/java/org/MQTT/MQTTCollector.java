@@ -147,7 +147,7 @@ public class MQTTCollector implements MqttCallback{
     // Thread separato per il giroscopio
     private void handleGyroscopeMessage(JSONObject sensorMessage) {
         try {
-            System.out.println("Work in progress for gyroscope.");
+            System.out.println("\nWork in progress for gyroscope.\n");
             /*
             double angleX = Double.parseDouble(sensorMessage.get("angle_x").toString());
             double angleY = Double.parseDouble(sensorMessage.get("angle_y").toString());

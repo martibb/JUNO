@@ -8,6 +8,7 @@
 
 #include "../lidar/lidar.h"
 #include "../gyroscope/gyroscope.h"
+#include <locale.h>
 
 #define LOG_MODULE "motion-hub"
 #define LOG_LEVEL LOG_LEVEL_DBG
@@ -52,6 +53,7 @@ typedef struct {
     float gyro_z;
 } gyroscope_data_t;
 
+// Coda di eventi
 typedef struct {
     char topic[BUFFER_SIZE];
     char message[APP_BUFFER_SIZE];
@@ -156,6 +158,9 @@ static void process_queue(void) {
 }
 
 PROCESS_THREAD(mqtt_client_process, ev, data) {
+
+    setlocale(LC_NUMERIC, "C");
+
     PROCESS_BEGIN();
 
     LOG_INFO("MQTT Sensors Process Started\n");
