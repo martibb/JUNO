@@ -10,7 +10,7 @@ MODULES += $(CONTIKI_NG_APP_LAYER_DIR)/mqtt
 -include $(CONTIKI)/Makefile.identify-target
 
 MODULES_REL += arch/platform/$(TARGET)
-MODULES_REL += $(ROOT)/sensing/lidar
-MUDULES_REL += $(ROOT)/sensing/gyroscope
+MODULES_REL += $(ROOT)/sensing/lidar/
+MUDULES_REL += $(ROOT)/sensing/gyroscope/
 
 include $(CONTIKI)/Makefile.include
