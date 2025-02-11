@@ -62,14 +62,20 @@ public class Controller {
                     System.out.println("stop          To stop the current session and return to main menu\\n");
                     dataManager.initializePosition(false);
                     MQTTClient.startRetrieving();
+                    System.out.println("\nJUNO is walking...\n");
                     MQTTClient.sendControlCommand("start");
                     runningSession = true;
                     break;
                 case "labTest":
                     System.out.println("Starting a new laboratory test session...");
-                    System.out.println("PRESS THE BUTTON OVER THE SENSOR TO DISABLE IT.");
+                    System.out.println("\nCOMMAND AVAILABLE:");
+                    System.out.println("stop          To stop the current session and return to main menu");
+                    System.out.println("button press  1. quickly press the button to simulate LiDAR out of oder");
+                    System.out.println("              2. press the button for >= 2 sec to simulate " +
+                            "gyroscope out of order\n");
                     dataManager.initializePosition(true);
                     MQTTClient.startRetrieving();
+                    System.out.println("\nJUNO is walking...\n");
                     MQTTClient.sendControlCommand("test-session");
                     runningSession = true;
                     break;

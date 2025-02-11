@@ -95,13 +95,30 @@ PROCESS_THREAD(gyroscope_sensor_process, ev, data) {
         while (true) {
             PROCESS_YIELD();
 
-            if (ev == button_hal_press_event && gyro_test_running == 1) {
-                gyro_publishing_enabled = !gyro_publishing_enabled;
-                if (gyro_publishing_enabled) {
-                    LOG_INFO("Gyroscope resumed, publishing data...\n");
-                    etimer_reset(&et);
-                } else {
-                    LOG_INFO("Simulating gyroscope out of order. Gyroscope paused, stopping data publishing.\n");
+            if (gyro_test_running && ev == button_hal_press_event) {
+                press_time = clock_time();
+            }
+            else if (gyro_test_running && ev == button_hal_release_event) {
+                clock_time_t release_time = clock_time();
+                clock_time_t duration = release_time - press_time;
+
+                if (duration >= CLOCK_SECOND * 2) {
+                    if (gyro_publishing_enabled) {
+                        gyro_publishing_enabled = 0;
+                        LOG_INFO("Gyroscope paused, stopping data publishing.\n");
+
+                        do {
+                            PROCESS_WAIT_EVENT_UNTIL(ev == button_hal_press_event);
+                            press_time = clock_time();
+                            PROCESS_WAIT_EVENT_UNTIL(ev == button_hal_release_event);
+                            release_time = clock_time();
+                            duration = release_time - press_time;
+                        } while (duration < CLOCK_SECOND * 2);
+
+                        gyro_publishing_enabled = 1;
+                        LOG_INFO("Gyroscope resumed, publishing data...\n");
+                        etimer_reset(&et);
+                    }
                 }
             }
 
