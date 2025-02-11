@@ -65,10 +65,6 @@ public class Controller {
                     MQTTClient.sendControlCommand("start");
                     runningSession = true;
                     break;
-                case "getPosition":
-                    System.out.println("The last position reported from the rover is:");
-                    System.out.println("Work in progress!");
-                    break;
                 case "labTest":
                     System.out.println("Starting a new laboratory test session...");
                     System.out.println("PRESS THE BUTTON OVER THE SENSOR TO DISABLE IT.");
