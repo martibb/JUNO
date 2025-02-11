@@ -8,6 +8,7 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 public class CoAPClient {
     private static String servoMotorsUri;
+    private static String harpoonsUri;
 
     public CoAPClient() {
         String filePath = "actuatorsURI.txt";
@@ -17,6 +18,7 @@ public class CoAPClient {
     private void readActuatorURIs(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             servoMotorsUri = reader.readLine();
+            harpoonsUri = reader.readLine();
         } catch (IOException e) {
             System.out.println("Failed to read actuator URIs from file");
             e.printStackTrace();
@@ -27,7 +29,11 @@ public class CoAPClient {
         return ("coap://["+servoMotorsUri+"]/movement");
     }
 
-    public static void servoMotorsPostRequest(String uri, String payload) {
+    public static String getHarpoonsUri() {
+        return ("coap://["+harpoonsUri+"]/anchoring");
+    }
+
+    public static void actuatorsPostRequest(String uri, String payload) {
         CoapClient coapClient = new CoapClient(uri);
         coapClient.post(String.valueOf(payload), MediaTypeRegistry.APPLICATION_JSON);
     }

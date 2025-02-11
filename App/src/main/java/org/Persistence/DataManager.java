@@ -1,8 +1,6 @@
 package org.Persistence;
 
-import org.Persistence.Entities.LidarReading;
-import org.Persistence.Entities.MotorsCommand;
-import org.Persistence.Entities.Position;
+import org.Persistence.Entities.*;
 
 import java.sql.*;
 
@@ -196,12 +194,15 @@ public class DataManager {
         return null;
     }
 
-    public void insertHarpoonCommand(boolean fire) {
+    public void insertHarpoonCommand(HarpoonsCommand newCommand) {
+
+        int newState = newCommand.getNewCommand();
+
         String query = "INSERT INTO harpoon_commands (fire) VALUES (?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setBoolean(1, fire);
+            stmt.setInt(1, newState);
             stmt.executeUpdate();
-            System.out.println("Harpoons command saved: " + (fire ? "Active" : "Unactive"));
+            System.out.println("Harpoons command saved: " + (newState == 1 ? "Active" : "Unactive"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -220,7 +221,12 @@ public class DataManager {
         return "No command found.";
     }
 
-    public void insertGyroscopeData(float angleX, float angleY, float angleZ) {
+    public void insertGyroscopeData(GyroscopeReading newRecord) {
+
+        float angleX = newRecord.getX();
+        float angleY = newRecord.getY();
+        float angleZ = newRecord.getZ();
+
         String query = "INSERT INTO gyro_readings (angle_x, angle_y, angle_z) VALUES (?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setFloat(1, angleX);

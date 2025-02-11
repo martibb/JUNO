@@ -2,9 +2,7 @@ package org.MQTT;
 
 import org.CoAP.CoAPClient;
 import org.Persistence.DataManager;
-import org.Persistence.Entities.LidarReading;
-import org.Persistence.Entities.MotorsCommand;
-import org.Persistence.Entities.Position;
+import org.Persistence.Entities.*;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -117,11 +115,10 @@ public class MQTTCollector implements MqttCallback{
             int leftDistance = Integer.parseInt(sensorMessage.get("distance_left").toString());
 
             LidarReading newLidarRecord = new LidarReading(frontDistance, rightDistance, leftDistance);
-            dataManager.insertLidarReading(newLidarRecord);
-
             MotorsCommand newMotorsRecord = new MotorsCommand(newLidarRecord);
 
             synchronized (this) {
+                dataManager.insertLidarReading(newLidarRecord);
                 dataManager.insertMotorsCommand(newMotorsRecord);
 
                 position.updatePosition(newMotorsRecord);
@@ -134,7 +131,7 @@ public class MQTTCollector implements MqttCallback{
             int newDirection = newMotorsRecord.getNewDirection();
             int stepSize = newMotorsRecord.getStepSize();
             String postPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
-            CoAPClient.servoMotorsPostRequest(CoAPClient.getServoMotorsUri(), postPayload);
+            CoAPClient.actuatorsPostRequest(CoAPClient.getServoMotorsUri(), postPayload);
 
             long endTime = System.currentTimeMillis();
             System.out.println("[LIDAR] CoAP Request Time: " + (endTime - startTime) + " ms");
@@ -151,14 +148,24 @@ public class MQTTCollector implements MqttCallback{
             float angleY = Float.parseFloat(sensorMessage.get("gyro_y").toString());
             float angleZ = Float.parseFloat(sensorMessage.get("gyro_z").toString());
 
-            dataManager.insertGyroscopeData(angleX, angleY, angleZ);
+            GyroscopeReading newGyroscopeRecord = new GyroscopeReading(angleX, angleY, angleZ);
+            HarpoonsCommand newHarpoonsCommand = new HarpoonsCommand(newGyroscopeRecord);
+
+            synchronized (this) {
+                dataManager.insertGyroscopeData(newGyroscopeRecord);
+                dataManager.insertHarpoonCommand(newHarpoonsCommand);
+
+                /* position.updateInclinatio(newMotorsRecord); //TODO
+                if (!testRunning) {
+                    dataManager.insertPosition();
+                }*/
+            }
 
             long startTime = System.currentTimeMillis();
-            String postPayload = "{ \"angle_x\": " + angleX + ", \"angle_y\": " + angleY + ", \"angle_z\": " + angleZ + " }";
-
+            int stateRequest = newHarpoonsCommand.getNewCommand(); //TODO TOTRY //Provare attivazione, inserimento nel db
+            String postPayload = "{ \"request\": " + stateRequest + " }";
             System.out.println(postPayload);
-
-            //CoAPClient.harpoonsPostRequest(CoAPClient.getHarpoonsUri(), postPayload);
+            CoAPClient.actuatorsPostRequest(CoAPClient.getHarpoonsUri(), postPayload);
 
             long endTime = System.currentTimeMillis();
             System.out.println("[GYROSCOPE] CoAP Request Time: " + (endTime - startTime) + " ms");
