@@ -31,13 +31,13 @@ typedef struct {
 } gyroscope_data_t;
 
 float generate_random_gyro_value() {
-    float random_val = (float)rand() / (float)RAND_MAX; // Genera un numero tra 0 e 1
+    float random_val = (float)rand() / (float)RAND_MAX;
 
     if (random_val < 0.3) {
-        // Con il 40% di probabilità, genera un valore critico oltre 45°
+        // 40% of probability to generate a critical value, that means over 45°
         return (rand() % 90) + 45.0; // Angoli tra 45 e 135 gradi
     } else {
-        // Con l'60% di probabilità, genera un valore normale tra -45° e 45°
+        // 60% of probability to generate a value between a normal range [-45°, 45°]
         return ((float)rand() / (float)RAND_MAX) * 90.0 - 45.0;
     }
 }
@@ -57,7 +57,7 @@ void gyro_update_leds(float slope) {
         leds_off(LEDS_GREEN);
         leds_off(LEDS_YELLOW);
         leds_on(LEDS_RED);
-    } else { // Se torna alla normalità, accendi verde
+    } else {
         set_all_green();
     }
 }
@@ -78,8 +78,8 @@ PROCESS_THREAD(gyroscope_sensor_process, ev, data) {
     PROCESS_BEGIN();
 
     subscriber = (struct process*)data;
-    button_hal_init(); // Inizializza i pulsanti
-    set_all_green();   // Inizializza LED verdi all'avvio
+    button_hal_init();
+    set_all_green();
 
     LOG_INFO("Gyroscope sensor process started...\n");
 
