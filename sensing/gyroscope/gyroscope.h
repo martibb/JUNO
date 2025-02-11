@@ -1,7 +1,7 @@
 #ifndef GYROSCOPE_H_
 #define GYROSCOPE_H_
 
-#define GYROSCOPE_SAMPLING_INTERVAL 12
+#define GYROSCOPE_SAMPLING_INTERVAL 10
 
 PROCESS_NAME(gyroscope_sensor_process);
 

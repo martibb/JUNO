@@ -19,7 +19,7 @@ process_event_t GYROSCOPE_ALARM_EVENT;
 process_event_t GYROSCOPE_STOP_EVENT;
 
 #define GYRO_CRITICAL_ANGLE 45.0
-#define GYROSCOPE_SAMPLING_INTERVAL 12   // Measurement interval (seconds)
+#define GYROSCOPE_SAMPLING_INTERVAL 10   // Measurement interval (seconds)
 
 int gyro_publishing_enabled = 1; // 1 = Publish, 0 = Pause publishing
 int gyro_test_running = 0; // 0 = explore session, 1 = test session
@@ -33,7 +33,7 @@ typedef struct {
 float generate_random_gyro_value() {
     float random_val = (float)rand() / (float)RAND_MAX; // Genera un numero tra 0 e 1
 
-    if (random_val < 0.4) {
+    if (random_val < 0.3) {
         // Con il 40% di probabilità, genera un valore critico oltre 45°
         return (rand() % 90) + 45.0; // Angoli tra 45 e 135 gradi
     } else {
@@ -132,13 +132,9 @@ PROCESS_THREAD(gyroscope_sensor_process, ev, data) {
                             gyro_update_leds(gyroscope_data.gyro_y);
                         }
                     }
-
-                    // Prova qui:
-                    process_post(subscriber, GYROSCOPE_SLOPE_EVENT, &gyroscope_data);
-
                 }
 
-                //process_post(subscriber, GYROSCOPE_SLOPE_EVENT, &gyroscope_data);
+                process_post(subscriber, GYROSCOPE_SLOPE_EVENT, &gyroscope_data);
                 etimer_reset(&et);
             } else if (gyro_test_running == 1) {
                 set_all_green();

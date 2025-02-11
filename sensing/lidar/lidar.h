@@ -1,7 +1,7 @@
 #ifndef LIDAR_H_
 #define LIDAR_H_
 
-#define LIDAR_SAMPLING_INTERVAL   5
+#define LIDAR_SAMPLING_INTERVAL   4
 #define LIDAR_UPPER_BOUND        300
 #define LIDAR_LOWER_BOUND        10
 

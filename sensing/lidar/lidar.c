@@ -18,8 +18,8 @@ process_event_t LIDAR_ALARM_EVENT;
 process_event_t LIDAR_STOP_EVENT;
 
 #define LIDAR_MAX_DISTANCE 100  // Maximum distance (meters)
-#define LIDAR_OBSTACLE_PROBABILITY 0.2 // Obstacle probability
-#define LIDAR_SAMPLING_INTERVAL 5   // Measurement interval (seconds)
+#define LIDAR_OBSTACLE_PROBABILITY 0.3 // Obstacle probability
+#define LIDAR_SAMPLING_INTERVAL 4   // Measurement interval (seconds)
 
 int publishing_enabled = 1; // 1 = Publish, 0 = Pause publishing
 int test_running = 0; // 0 = explore session, 1 = test session
