@@ -56,7 +56,7 @@ public class MQTTCollector implements MqttCallback{
 
     public void stopRetrieving() {
         unsubscribeFromTopic(lidarTopic);
-        //unsubscribeFromTopic(gyroscopeTopic);
+        unsubscribeFromTopic(gyroscopeTopic);
     }
 
     public void unsubscribeFromTopic(String topic) {
@@ -81,7 +81,7 @@ public class MQTTCollector implements MqttCallback{
                 mqttClient.connect();
 
                 mqttClient.subscribe(lidarTopic);
-                //mqttClient.subscribe(gyroscopeTopic);
+                mqttClient.subscribe(gyroscopeTopic);
                 System.out.println("Connection is restored");
             }catch(MqttException | InterruptedException me) {
                 System.out.println("I could not connect");
@@ -91,7 +91,6 @@ public class MQTTCollector implements MqttCallback{
 
     public void messageArrived(String topic, MqttMessage message) {
         byte[] payload = message.getPayload();
-        System.out.println("New message received!");
 
         try {
             JSONObject sensorMessage = (JSONObject) JSONValue.parseWithException(new String(payload));
@@ -127,14 +126,10 @@ public class MQTTCollector implements MqttCallback{
                 }
             }
 
-            long startTime = System.currentTimeMillis();
             int newDirection = newMotorsRecord.getNewDirection();
             int stepSize = newMotorsRecord.getStepSize();
             String postPayload = "{ \"direction\": " + newDirection + ", \"angle\": " + stepSize + " }";
             CoAPClient.actuatorsPostRequest(CoAPClient.getServoMotorsUri(), postPayload);
-
-            long endTime = System.currentTimeMillis();
-            System.out.println("[LIDAR] CoAP Request Time: " + (endTime - startTime) + " ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,8 +137,6 @@ public class MQTTCollector implements MqttCallback{
 
     private void handleGyroscopeMessage(JSONObject sensorMessage) {
         try {
-            System.out.println("\nWork in progress for gyroscope.\n");
-
             float angleX = Float.parseFloat(sensorMessage.get("gyro_x").toString());
             float angleY = Float.parseFloat(sensorMessage.get("gyro_y").toString());
             float angleZ = Float.parseFloat(sensorMessage.get("gyro_z").toString());
@@ -154,21 +147,12 @@ public class MQTTCollector implements MqttCallback{
             synchronized (this) {
                 dataManager.insertGyroscopeData(newGyroscopeRecord);
                 dataManager.insertHarpoonCommand(newHarpoonsCommand);
-
-                /* position.updateInclinatio(newMotorsRecord); //TODO
-                if (!testRunning) {
-                    dataManager.insertPosition();
-                }*/
             }
 
-            long startTime = System.currentTimeMillis();
-            int stateRequest = newHarpoonsCommand.getNewCommand(); //TODO TOTRY //Provare attivazione, inserimento nel db
+            int stateRequest = newHarpoonsCommand.getNewCommand();
             String postPayload = "{ \"request\": " + stateRequest + " }";
-            System.out.println(postPayload);
             CoAPClient.actuatorsPostRequest(CoAPClient.getHarpoonsUri(), postPayload);
 
-            long endTime = System.currentTimeMillis();
-            System.out.println("[GYROSCOPE] CoAP Request Time: " + (endTime - startTime) + " ms");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,11 +172,7 @@ public class MQTTCollector implements MqttCallback{
 
             try {
                 MqttMessage message = new MqttMessage(command.getBytes());
-                //mqttClient.publish("sensor/control", message); // prima versione test (solo lidar) + legs-servo-motors
-                //mqttClient.publish("lidar/control", message);
-                //mqttClient.publish("gyroscope/control", message);
                 mqttClient.publish("sensor/control", message);
-                System.out.println("Sent control command: " + command);
             } catch (MqttException e) {
                 System.out.println("Failed to send control command: " + e.getMessage());
             }

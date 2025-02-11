@@ -78,7 +78,6 @@ public class DataManager {
             stmt.setFloat(2, distanceRight);
             stmt.setFloat(3, distanceLeft);
             stmt.executeUpdate();
-            System.out.println("Lidar data saved: Front: " + distanceFront + " m, Right: " + distanceRight + " m, Left: " + distanceLeft + " m");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -112,7 +111,6 @@ public class DataManager {
             stmt.setFloat(1, newDirection);
             stmt.setFloat(2, stepSize);
             stmt.executeUpdate();
-            System.out.println("Servo Motors Command saved.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -147,7 +145,6 @@ public class DataManager {
             stmt.setInt(1, newX);
             stmt.setInt(2, newY);
             stmt.executeUpdate();
-            System.out.println("New position saved.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -182,7 +179,6 @@ public class DataManager {
             stmt.setFloat(2, angleY);
             stmt.setFloat(3, angleZ);
             stmt.executeUpdate();
-            System.out.println("Gyroscope data saved.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -213,7 +209,6 @@ public class DataManager {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, newState);
             stmt.executeUpdate();
-            System.out.println("Harpoons command saved: " + (newState == 1 ? "Active" : "Unactive"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
