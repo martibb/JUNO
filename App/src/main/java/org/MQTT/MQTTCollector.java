@@ -62,7 +62,6 @@ public class MQTTCollector implements MqttCallback{
     public void unsubscribeFromTopic(String topic) {
         try {
             mqttClient.unsubscribe(topic);
-            System.out.println("Unsubscribed from topic: " + topic);
         } catch (MqttException e) {
             System.out.println("Failed to unsubscribe from topic: " + topic);
             e.printStackTrace();

@@ -51,8 +51,6 @@ public class MotorsCommand {
         if (newDirection == 4 || newDirection == 3) {
             stepSize = -stepSize;
         }
-
-        System.out.println("STEPSIZE: " + stepSize);
     }
 
     public int getNewDirection() { return newDirection; }
