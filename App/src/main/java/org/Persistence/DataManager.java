@@ -170,23 +170,34 @@ public class DataManager {
         return null;
     }
 
-    public void insertGyroReading(float angle) {
-        String query = "INSERT INTO gyro_readings (angle) VALUES (?)";
+    public void insertGyroscopeData(GyroscopeReading newRecord) {
+
+        float angleX = newRecord.getX();
+        float angleY = newRecord.getY();
+        float angleZ = newRecord.getZ();
+
+        String query = "INSERT INTO gyro_readings (angle_x, angle_y, angle_z) VALUES (?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setFloat(1, angle);
+            stmt.setFloat(1, angleX);
+            stmt.setFloat(2, angleY);
+            stmt.setFloat(3, angleZ);
             stmt.executeUpdate();
-            System.out.println("Gyroscope data saved: " + angle + "°");
+            System.out.println("Gyroscope data saved.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Float getLastGyroReading() {
-        String query = "SELECT angle FROM gyro_readings ORDER BY timestamp DESC LIMIT 1";
+    public GyroscopeReading getLastGyroReading() {
+        String query = "SELECT angle_x, angle_y, angle_z FROM gyro_readings ORDER BY timestamp DESC LIMIT 1";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
-                return rs.getFloat("angle");
+                return new GyroscopeReading(
+                        rs.getFloat("angle_x"),
+                        rs.getFloat("angle_y"),
+                        rs.getFloat("angle_z")
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -208,34 +219,18 @@ public class DataManager {
         }
     }
 
-    public String getLastHarpoonCommand() {
+    public HarpoonsCommand getLastHarpoonCommand() {
         String query = "SELECT fire FROM harpoon_commands ORDER BY timestamp DESC LIMIT 1";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
-                return rs.getBoolean("fire") ? "Active" : "Unactive";
+                return new HarpoonsCommand(
+                        rs.getInt("fire")
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "No command found.";
-    }
-
-    public void insertGyroscopeData(GyroscopeReading newRecord) {
-
-        float angleX = newRecord.getX();
-        float angleY = newRecord.getY();
-        float angleZ = newRecord.getZ();
-
-        String query = "INSERT INTO gyro_readings (angle_x, angle_y, angle_z) VALUES (?,?,?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setFloat(1, angleX);
-            stmt.setFloat(2, angleY);
-            stmt.setFloat(3, angleZ);
-            stmt.executeUpdate();
-            System.out.println("Gyroscope data saved.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return null;
     }
 }

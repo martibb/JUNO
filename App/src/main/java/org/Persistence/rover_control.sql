@@ -28,7 +28,7 @@ CREATE TABLE leg_commands (
 CREATE TABLE harpoon_commands (
     id INT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fire BOOLEAN NOT NULL
+    fire INT NOT NULL
 );
 
 CREATE TABLE rover_position (

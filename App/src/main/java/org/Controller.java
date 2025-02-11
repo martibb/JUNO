@@ -3,9 +3,7 @@ package org;
 import org.CoAP.CoAPClient;
 import org.MQTT.MQTTCollector;
 import org.Persistence.DataManager;
-import org.Persistence.Entities.LidarReading;
-import org.Persistence.Entities.MotorsCommand;
-import org.Persistence.Entities.Position;
+import org.Persistence.Entities.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +24,9 @@ public class Controller {
             "labTest       Start a laboratory test session of the rover\n" +
             "lastLidar     Read last distances sensed by the LiDAR sensor\n" +
             "lastMotors    Read last command executed by the servo motors of the rover's legs\n" +
+            "lastSlope     Read last inclination data collected by the gyroscope\n" +
+            "lastHarpoons  Read last command executed by the harpoons of the rover's legs\n" +
+            "lastPosition  Read last position registered\n" +
             "help          Show all commands\n" +
             "quit          Close controller\n";
 
@@ -103,6 +104,22 @@ public class Controller {
                     else
                         System.out.println(lastMotorsCommand);
                     break;
+                case "lastSlope":
+                    GyroscopeReading lastGyroscopeReading = dataManager.getLastGyroReading();
+                    if(lastGyroscopeReading==null)
+                        System.out.println("No records stored yet.");
+                    else
+                        System.out.println(lastGyroscopeReading);
+                    break;
+                case "lastHarpoons":
+                    HarpoonsCommand lastHarpoonsCommand = dataManager.getLastHarpoonCommand();
+                    if(lastHarpoonsCommand==null)
+                        System.out.println("No records stored yet.");
+                    else
+                        System.out.println(lastHarpoonsCommand);
+                    break;
+                case "lastPosition":
+                    System.out.println(position);
                 default:
                     System.out.println("Command not supported. Try the following:");
                     System.out.println(COMMANDS);
