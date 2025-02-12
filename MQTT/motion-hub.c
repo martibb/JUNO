@@ -48,9 +48,9 @@ typedef struct {
 } lidar_data_t;
 
 typedef struct {
-    float gyro_x;
-    float gyro_y;
-    float gyro_z;
+    int gyro_x;
+    int gyro_y;
+    int gyro_z;
 } gyroscope_data_t;
 
 // Coda di eventi
@@ -220,7 +220,7 @@ PROCESS_THREAD(mqtt_client_process, ev, data) {
         if (ev == GYROSCOPE_SLOPE_EVENT && state == STATE_SUBSCRIBED) {
             LOG_INFO("New slope event\n");
             gyroscope_data_t *gyroscope_data = (gyroscope_data_t *)data;
-            snprintf(gyroscope_buffer, APP_BUFFER_SIZE, "{\"gyro_x\": %.2f, \"gyro_y\": %.2f, \"gyro_z\": %.2f}",
+            snprintf(gyroscope_buffer, APP_BUFFER_SIZE, "{\"gyro_x\": %d, \"gyro_y\": %d, \"gyro_z\": %d}",
                         gyroscope_data->gyro_x, gyroscope_data->gyro_y, gyroscope_data->gyro_z);
             enqueue_publish(gyroscope_topic, gyroscope_buffer);
         }

@@ -74,9 +74,9 @@ public class DataManager {
         String query = "INSERT INTO lidar_readings (distance_front, distance_right, distance_left) VALUES (?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setFloat(1, distanceFront);
-            stmt.setFloat(2, distanceRight);
-            stmt.setFloat(3, distanceLeft);
+            stmt.setInt(1, distanceFront);
+            stmt.setInt(2, distanceRight);
+            stmt.setInt(3, distanceLeft);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -108,8 +108,8 @@ public class DataManager {
 
         String query = "INSERT INTO leg_commands (new_direction, step_size) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setFloat(1, newDirection);
-            stmt.setFloat(2, stepSize);
+            stmt.setInt(1, newDirection);
+            stmt.setInt(2, stepSize);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,15 +169,15 @@ public class DataManager {
 
     public void insertGyroscopeData(GyroscopeReading newRecord) {
 
-        float angleX = newRecord.getX();
-        float angleY = newRecord.getY();
-        float angleZ = newRecord.getZ();
+        int angleX = newRecord.getX();
+        int angleY = newRecord.getY();
+        int angleZ = newRecord.getZ();
 
         String query = "INSERT INTO gyro_readings (angle_x, angle_y, angle_z) VALUES (?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setFloat(1, angleX);
-            stmt.setFloat(2, angleY);
-            stmt.setFloat(3, angleZ);
+            stmt.setInt(1, angleX);
+            stmt.setInt(2, angleY);
+            stmt.setInt(3, angleZ);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -190,9 +190,9 @@ public class DataManager {
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 return new GyroscopeReading(
-                        rs.getFloat("angle_x"),
-                        rs.getFloat("angle_y"),
-                        rs.getFloat("angle_z")
+                        rs.getInt("angle_x"),
+                        rs.getInt("angle_y"),
+                        rs.getInt("angle_z")
                 );
             }
         } catch (SQLException e) {

@@ -13,16 +13,16 @@ CREATE TABLE lidar_readings (
 CREATE TABLE gyro_readings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    angle_x FLOAT NOT NULL,
-    angle_y FLOAT NOT NULL,
-    angle_z FLOAT NOT NULL
+    angle_x INT NOT NULL,
+    angle_y INT NOT NULL,
+    angle_z INT NOT NULL
 );
 
 CREATE TABLE leg_commands (
     id INT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    new_direction FLOAT NOT NULL,
-    step_size FLOAT NOT NULL
+    new_direction INT NOT NULL,
+    step_size INT NOT NULL
 );
 
 CREATE TABLE harpoon_commands (

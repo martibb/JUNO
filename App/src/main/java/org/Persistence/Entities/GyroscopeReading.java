@@ -1,19 +1,19 @@
 package org.Persistence.Entities;
 
 public class GyroscopeReading {
-    private final float xAxis;
-    private final float yAxis;
-    private final float zAxis;
+    private final int xAxis;
+    private final int yAxis;
+    private final int zAxis;
 
-    public GyroscopeReading(float x, float y, float z) {
+    public GyroscopeReading(int x, int y, int z) {
         xAxis = x;
         yAxis = y;
         zAxis = z;
     }
 
-    public float getX() { return xAxis; }
-    public float getY() { return yAxis; }
-    public float getZ() { return zAxis; }
+    public int getX() { return xAxis; }
+    public int getY() { return yAxis; }
+    public int getZ() { return zAxis; }
 
     @Override
     public String toString() {

@@ -119,11 +119,11 @@ public class MQTTCollector implements MqttCallback{
             MotorsCommand newMotorsRecord = new MotorsCommand(newLidarRecord);
 
             synchronized (this) {
-                dataManager.insertLidarReading(newLidarRecord);
-                dataManager.insertMotorsCommand(newMotorsRecord);
-
                 position.updatePosition(newMotorsRecord);
+
                 if (!testRunning) {
+                    dataManager.insertLidarReading(newLidarRecord);
+                    dataManager.insertMotorsCommand(newMotorsRecord);
                     dataManager.insertPosition();
                 }
             }
@@ -139,16 +139,18 @@ public class MQTTCollector implements MqttCallback{
 
     private void handleGyroscopeMessage(JSONObject sensorMessage) {
         try {
-            float angleX = Float.parseFloat(sensorMessage.get("gyro_x").toString());
-            float angleY = Float.parseFloat(sensorMessage.get("gyro_y").toString());
-            float angleZ = Float.parseFloat(sensorMessage.get("gyro_z").toString());
+            int angleX = Integer.parseInt(sensorMessage.get("gyro_x").toString());
+            int angleY = Integer.parseInt(sensorMessage.get("gyro_y").toString());
+            int angleZ = Integer.parseInt(sensorMessage.get("gyro_z").toString());
 
             GyroscopeReading newGyroscopeRecord = new GyroscopeReading(angleX, angleY, angleZ);
             HarpoonsCommand newHarpoonsCommand = new HarpoonsCommand(newGyroscopeRecord);
 
             synchronized (this) {
-                dataManager.insertGyroscopeData(newGyroscopeRecord);
-                dataManager.insertHarpoonCommand(newHarpoonsCommand);
+                if (!testRunning) {
+                    dataManager.insertGyroscopeData(newGyroscopeRecord);
+                    dataManager.insertHarpoonCommand(newHarpoonsCommand);
+                }
             }
 
             int stateRequest = newHarpoonsCommand.getNewCommand();

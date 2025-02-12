@@ -35,24 +35,28 @@ int generate_lidar_value() {
 }
 
 void update_leds(int distance) {
-    if (distance== 100) {
+    if (distance > 20 && distance < 100) {
+        LOG_INFO("Set led as green.\n");
+        leds_off(LEDS_BLUE);
         leds_on(LEDS_GREEN);
-        leds_off(LEDS_YELLOW);
-        leds_off(LEDS_RED);
-    } else if (distance < 100 && distance > 20) {
-        leds_off(LEDS_GREEN);
-        leds_on(LEDS_YELLOW);
         leds_off(LEDS_RED);
     } else if (distance <= 20) {
+        LOG_INFO("Set led as red.\n");
+        leds_off(LEDS_BLUE);
         leds_off(LEDS_GREEN);
-        leds_off(LEDS_YELLOW);
         leds_on(LEDS_RED);
+    } else if (distance == 100) {
+        LOG_INFO("Set led as blue.\n");
+        leds_on(LEDS_BLUE);
+        leds_off(LEDS_GREEN);
+        leds_off(LEDS_RED);
     }
 }
 
 void reset_leds() {
+    LOG_INFO("Reset all leds to off.\n");
+    leds_off(LEDS_BLUE);
     leds_off(LEDS_GREEN);
-    leds_off(LEDS_YELLOW);
     leds_off(LEDS_RED);
 }
 
