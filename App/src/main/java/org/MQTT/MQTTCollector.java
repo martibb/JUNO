@@ -101,6 +101,9 @@ public class MQTTCollector implements MqttCallback{
             } else {
                 System.out.printf("Unknown topic: [%s] %s%n", topic, new String(payload));
             }
+
+            System.out.println("[JUNO] Rover walking: position x=" + position.getX() + ", y=" +
+                    position.getY() + ";");
         } catch (Exception e) {
             e.printStackTrace();
         }
