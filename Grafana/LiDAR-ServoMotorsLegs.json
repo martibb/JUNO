@@ -31,7 +31,7 @@
       },
       "id": 3,
       "panels": [],
-      "title": "LiDAR-Servo Motors on Robotic Legs",
+      "title": "JUNO sensors, actuators and position",
       "type": "row"
     },
     {
@@ -42,7 +42,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-BlPu"
+            "fixedColor": "blue",
+            "mode": "continuous-purples"
           },
           "custom": {
             "axisBorderShow": false,
@@ -62,7 +63,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepBefore",
             "lineStyle": {
               "fill": "solid"
             },
@@ -88,6 +89,10 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           }
@@ -100,7 +105,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "distance_front"
+                  "distance_left"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -141,7 +146,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "dataset": "rover_control",
@@ -211,7 +216,7 @@
           "table": "lidar_readings"
         }
       ],
-      "title": "Distances in direction front, right and left",
+      "title": "LiDAR readings",
       "type": "timeseries"
     },
     {
@@ -270,7 +275,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 16,
+        "h": 8,
         "w": 12,
         "x": 12,
         "y": 1
@@ -293,7 +298,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "dataset": "rover_control",
@@ -354,7 +359,128 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 5,
+      "options": {
+        "colWidth": 0.9,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "dataset": "rover_control",
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT timestamp, angle_x, angle_y, angle_z FROM rover_control.gyro_readings LIMIT 50 ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "timestamp",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "angle_x",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "angle_y",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "angle_z",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "gyro_readings"
+        }
+      ],
+      "title": "Gyroscope readings",
+      "type": "status-history"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "cec1axvy7j20wa"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-BlPu"
           },
           "custom": {
             "axisBorderShow": false,
@@ -364,7 +490,7 @@
             "axisPlacement": "right",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
-            "drawStyle": "line",
+            "drawStyle": "points",
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
@@ -375,7 +501,7 @@
             "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 2,
-            "pointSize": 5,
+            "pointSize": 8,
             "scaleDistribution": {
               "type": "linear"
             },
@@ -407,9 +533,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 4,
         "w": 12,
-        "x": 0,
+        "x": 12,
         "y": 9
       },
       "id": 1,
@@ -426,7 +552,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "11.5.1",
       "targets": [
         {
           "dataset": "rover_control",
@@ -484,6 +610,128 @@
       ],
       "title": "Direction commands executed by leg's servo motors",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "uid": "cec1axvy7j20wa"
+      },
+      "description": "1 (Red) -> Dangerous inclination, Harpoons activated\n2 (Green) -> Acceptable Inclination, Harpoons not active",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "fillOpacity": 65,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Not active"
+                },
+                "1": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Active"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "id": 6,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.1",
+      "targets": [
+        {
+          "dataset": "rover_control",
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT timestamp, fire FROM rover_control.harpoon_commands LIMIT 50 ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "timestamp",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "fire",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "harpoon_commands"
+        }
+      ],
+      "title": "Harpoon states",
+      "type": "state-timeline"
     }
   ],
   "preload": false,
@@ -494,13 +742,13 @@
     "list": []
   },
   "time": {
-    "from": "2025-02-04T15:18:19.799Z",
-    "to": "2025-02-04T15:27:15.856Z"
+    "from": "2025-02-11T18:01:26.215Z",
+    "to": "2025-02-11T18:03:28.008Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "JUNO Stats",
   "uid": "cec1ewdjfzugwc",
-  "version": 6,
+  "version": 16,
   "weekStart": ""
 }
