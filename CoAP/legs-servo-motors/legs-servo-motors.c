@@ -20,6 +20,8 @@ PROCESS_THREAD(legs_servo_motors, ev, data)
 {
   PROCESS_BEGIN();
 
+  LOG_INFO("Motors Controller\n");
+
   PROCESS_PAUSE();
 
   LOG_INFO("Starting Robotic Legs Servo Motors Controller\n");
