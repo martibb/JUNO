@@ -105,7 +105,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "distance_left"
+                  "distance_front"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -415,7 +415,7 @@
           "dataset": "rover_control",
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT timestamp, angle_x, angle_y, angle_z FROM rover_control.gyro_readings LIMIT 50 ",
+          "rawSql": "SELECT timestamp, angle_x, angle_y, angle_z FROM rover_control.gyro_readings ORDER BY timestamp DESC LIMIT 50 ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -464,7 +464,17 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50
+            "limit": 50,
+            "orderBy": {
+              "property": {
+                "name": [
+                  "timestamp"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            },
+            "orderByDirection": "DESC"
           },
           "table": "gyro_readings"
         }
@@ -694,7 +704,7 @@
           "dataset": "rover_control",
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT timestamp, fire FROM rover_control.harpoon_commands LIMIT 50 ",
+          "rawSql": "SELECT timestamp, fire FROM rover_control.harpoon_commands ORDER BY timestamp DESC LIMIT 50 ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -725,7 +735,17 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50
+            "limit": 50,
+            "orderBy": {
+              "property": {
+                "name": [
+                  "timestamp"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            },
+            "orderByDirection": "DESC"
           },
           "table": "harpoon_commands"
         }
@@ -742,13 +762,13 @@
     "list": []
   },
   "time": {
-    "from": "2025-02-11T18:01:26.215Z",
-    "to": "2025-02-11T18:03:28.008Z"
+    "from": "2025-02-13T15:41:34.921Z",
+    "to": "2025-02-13T15:42:21.846Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "JUNO Stats",
   "uid": "cec1ewdjfzugwc",
-  "version": 16,
+  "version": 20,
   "weekStart": ""
 }
