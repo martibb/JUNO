@@ -28,24 +28,23 @@ public class MotorsCommand {
             stepSize = Math.max(frontDistance, Math.max(rightDistance, leftDistance))/2;
         }
 
-        // If all directions have equal associated distances there aren't obstacle at all and the rover can go forward
-        else if (frontDistance == rightDistance && frontDistance == leftDistance) {
+        // If the sensed front direction is equal to the maximum possible,
+        // there is no obstacle and the rover can go FORWARD
+        else if (frontDistance == MAX_DISTANCE) {
             newDirection = FORWARD;
             stepSize = frontDistance/2;
         }
 
+        // If the front sensed distance is below the maximum than the sensor can sense, there might be an obstacle,
+        // so the rover moves right or left, depending on the most free path
+        else if (rightDistance > leftDistance) {
+            newDirection = RIGHT;
+            stepSize = rightDistance/2;
+        }
+
         else {
-            // If the front sensed distance is below the maximum than the sensor can sense, there might be an obstacle,
-            // so the rover moves right or left, depending on the most free path
-            if (frontDistance < MAX_DISTANCE) {
-                if (rightDistance > leftDistance) {
-                    newDirection = RIGHT;
-                    stepSize = rightDistance/2;
-                } else {
-                    newDirection = LEFT;
-                    stepSize = leftDistance/2;
-                }
-            }
+            newDirection = LEFT;
+            stepSize = leftDistance/2;
         }
 
         if (newDirection == 4 || newDirection == 3) {
