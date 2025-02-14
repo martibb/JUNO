@@ -53,4 +53,5 @@ In particular:
 
 ### Grafana
 Export the Grafana dashboard, JUNO Stats, using the JSON code provided in the Grafana folder. You can see, in the case of explore mode, the data and position changing in real-time:
+
 ![Grafana dashboard screenshot.](https://i.ibb.co/tTL1tG6x/Screenshot-2025-02-12-182041.jpg)
