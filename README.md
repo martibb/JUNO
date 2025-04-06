@@ -43,8 +43,7 @@ In the end, for both cases:
 
 
 ### Java Application
-
-![JUNO interface](https://i.ibb.co/27yMVHHn/interface.png)
+![JUNO interface](https://i.postimg.cc/QM5Z1V9s/interface.png)
 
 In particular:
 
@@ -54,4 +53,4 @@ In particular:
 ### Grafana
 Export the Grafana dashboard, JUNO Stats, using the JSON code provided in the Grafana folder. You can see, in the case of explore mode, the data and position changing in real-time:
 
-![Grafana dashboard screenshot.](https://i.ibb.co/tTL1tG6x/Screenshot-2025-02-12-182041.jpg)
+![Grafana dashboard screenshot.](https://i.postimg.cc/jjyBC9mS/Screenshot-2025-02-12-182041.jpg)
